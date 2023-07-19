@@ -18,7 +18,7 @@ shift 2
 args=()
 opt=()
 
-bkhq_c="${XDG_CONFIG_HOME}/bkhq"
+bkhq_c="${HOME}/.config/bkhq"
 
 exl="$bkhq_c/exl"
 incl="$bkhq_c/inc"
