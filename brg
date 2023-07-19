@@ -75,7 +75,14 @@ case ${cmd} in
 
 	mount|mnt) 
 		prnt "mount: $brg_mnt" ""
-		args+=('mount' "$brg_mnt") ;;
+		args+=('mount')
+		args+=("$BORG_REPO") # repo
+		args+=("$brg_mnt") ;; # mnt point
+
+  umount|umnt) 
+		prnt "umount: $brg_mnt" ""
+		args+=('umount')
+		args+=("$brg_mnt") ;; # mnt point
 
 	backup-full|bf)
     prnt "src: full '/data/'" "exl: ${exl}:" ""
@@ -111,5 +118,5 @@ prnt_args "borg" "${args[@]}${yellow}"
 
 borg "${args[@]}"
 
-prnt_fin
+#prnt_fin
 
