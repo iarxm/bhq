@@ -13,15 +13,16 @@ shift 2
 args=()
 opt+=()
 
-bkhq_c="$HOME/.config/bkhq"
+bkhq_c="${XDG_CONFIG_HOME}/.config/bkhq"
 
-exl="$bkhq_c/exl"
+exl_a="$bkhq_c/exl"
+exl_b="$bkhq_c/exlb"
 incl="$bkhq_c/inc"
 incl_part_mid="$bkhq_c/inc.part"
 incl_part_min="$bkhq_c/inc.part.min"
 incl_part_mst="$bkhq_c/inc.part.mst"
 
-rst_mnt="$HOME/.local/share/amnt/xbk.brg/"
+brg_mnt="$HOME/.local/share/amnt/xbk.brg/"
 
 hostname="$HOST"
 
@@ -60,14 +61,26 @@ case ${cmd} in
 		#args+=('mount' 					'/home/iao/zs/xbk.rst/')
 
 	backup-full|bf)
-    prnt "src: full home: '/data/'" "excl: ${exl}:" ""
+    prnt "src: full '/data/'" "exl: ${exl}:" ""
     args+=( 'create' )
 		args+=( '-s' )
 		args+=( '--progress' )
-		args+=( "--exclude-from"	"$exl")
+		args+=( "--exclude-from"	"$exl_a")
 		args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
     args+=( "/data/" )
 		args+=( "${@}" 	) ;;
+
+  backup-mid|bk-mid)
+    prnt "src: partial.mid '/data/'" "exl: ${exl_a} & ${exl_b}:"
+    args+=( 'create' )
+		args+=( '-s' )
+		args+=( '--progress' )
+    args+=( "--exclude-from"	"$exl_b")
+		args+=( "--exclude-from"	"$exl_a")
+		args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
+    args+=( "/data/" )
+		args+=( "${@}" 	) ;;
+
 
 	part) 
 		#"Partial Home Backup # TODO

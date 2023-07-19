@@ -12,137 +12,137 @@ pkg_ls_dir="$HOME/.config/A.CONTROL/lsx"
 
 # decomp #############################################
 
-prnt() 	{ printf "BKHQ: %s\n" "##########################" "$1"; }
+prnt()  { printf "BKHQ: %s\n" "##########################" "$1"; }
 prntx() { printf "BKHQ: %s\n" "$1"; }
 
 
 # prep #################################################
 
 notif_func() {
-	linex+=()
+  linex+=()
 
-	linex+=("A. dsvv sync <dssy>?\n")
-	linex+=("B. rclone 2 gdrive <min>?\n")
-	linex+=("D. dva dvb snaps\n")
-	
-	linex+=("\nASYNCHRONOUS VITs:\n")
-	linex+=("0. bkhq que..\n")
-	linex+=("1. keys \n")
-	linex+=("2. logs \n")
+  linex+=("A. dsvv sync <dssy>?\n")
+  linex+=("B. rclone 2 gdrive <min>?\n")
+  linex+=("D. dva dvb snaps\n")
+  
+  linex+=("\nASYNCHRONOUS VITs:\n")
+  linex+=("0. bkhq que..\n")
+  linex+=("1. keys \n")
+  linex+=("2. logs \n")
 
-	linex+=("\nHABITS \n")
-	linex+=("X. git commits (atomised)")
+  linex+=("\nHABITS \n")
+  linex+=("X. git commits (atomised)")
 
-	liney=" ${linex[@]}"
+  liney=" ${linex[@]}"
 
-	notify-send -u low "REGULAR VITs:" "${liney}" ;}
-		
+  notify-send -u low "REGULAR VITs:" "${liney}" ;}
+    
 bk_sys_prepare() {
-	date=$(date +%y.%m.%d)
-	lsn=$(pacman -Qqen)
-	lsm=$(pacman -Qqem)
-	printf "%s\n" $lsn > "/etc/ll/pacmanls$date.n.txt"
-	printf "%s\n" $lsm > "/etc/ll/pacmanls$date.m.txt"
-	printf "%s\n" $lsn > "$pkg_ls_dir/$date.n.txt"
-	printf "%s\n" $lsm > "$pkg_ls_dir/$date.m.txt" ;}
+  date=$(date +%y.%m.%d)
+  lsn=$(pacman -Qqen)
+  lsm=$(pacman -Qqem)
+  printf "%s\n" $lsn > "/etc/ll/pacmanls$date.n.txt"
+  printf "%s\n" $lsm > "/etc/ll/pacmanls$date.m.txt"
+  printf "%s\n" $lsn > "$pkg_ls_dir/$date.n.txt"
+  printf "%s\n" $lsm > "$pkg_ls_dir/$date.m.txt" ;}
 
 # bksq ##################################################
 
-local_vcs_ax() 				{ rst lca bpmin; }
-local_vcs_ay() 				{ rst lca vc-xds; }
-remote_partial_min() 	{ yes | rst gcs bpmin; } # remote - part.min
+local_vcs_ax()        { rst lca bpmin; }
+local_vcs_ay()        { rst lca vc-xds; }
+remote_partial_min()  { yes | rst gcs bpmin; } # remote - part.min
 
 local_vcs_a() { # local version control
-	local_vcs_ax
-	local_vcs_ay ;}
+  local_vcs_ax
+  local_vcs_ay ;}
 
 regular_b() { # regular essentials
-	local_vcs_a
-	remote_partial_min
-	notif_func ;}
+  local_vcs_a
+  remote_partial_min
+  notif_func ;}
 
 device_a() {
-		prnt "starting bkp: '''dva's'''"
-		brg dva bf
-		rsn dva ;} #rs dva.pmin
+  prnt "starting bkp: '''dva's'''"
+  brg dva bf
+  rsn dva ;} #rs dva.pmin
 
 device_b() {
-		# disk too full: choose between brg or rsn backup just for this one. And choose a partial set of /data
-		prnt "starting '''dvb's''' bkps"
-		brg dvb bf ;} #rsn dvb #rs dvb.pmin
+  # disk too full: choose between brg or rsn backup just for this one. And choose a partial set of /data
+  prnt "starting '''dvb's''' bkps"
+  brg dvb bk-mid ;} #rsn dvb #rs dvb.pmin
 
 
 # cmd ##################################################
 
 case $cmd in
-	rga) 			local_vcs_ax;; # very regular essentialls
-	rgb) 			regular_b;;
-	lca)			local_vcs_a;; # local version control
-	rem.part) remote_partial_min;;
-	dva) 			device_a;;
-	dvb)			device_b;;
-	# maint
-	pre)			bk_sys_prepare;;
-	ky.c) 		ky dvc exp ;;
-	ky.d) 		ky dvd exp ;;
-	notif)		notif_func ;;
+  rga)      local_vcs_ax;; # very regular essentialls
+  rgb)      regular_b;;
+  lca)      local_vcs_a;; # local version control
+  rem.part) remote_partial_min;;
+  dva)      device_a;;
+  dvb)      device_b;;
+  # maint
+  pre)      bk_sys_prepare;;
+  ky.c)     ky dvc exp ;;
+  ky.d)     ky dvd exp ;;
+  notif)    notif_func ;;
 esac
 
 
 # bkls ####################################################
 
 bkls() {
-	# Make lists of dir's based on their cumulative size
-	#	TODO: IN PROGRESS
-	# ==============================
-	
-	# 1.
-	# 	- Create root associated folder in xfr.subls
-	# 	- Remove previous list in that folder if it exisits
-	# 	-
-	# 	TODO - add if condition to 'remove'
-	# 	TODO - make dir if doesn't exist
-	# 	TODO - tidy up file/variable names here
-	rut="${1}"
-	ls_files_dir="$XDG_BIN_HOME/fbk/xfr.subls/$rut"
-	rm -R $ls_files_dir/xfr.subls
-	
-	# 2.
-	# 	- Change to root dir
-	# 	- Create list of all dir's
-	# 	- Create empty list to feed them cumulatively into through the next loop
-	# 	- Setup a counter
-	cd "${rut}"
-	ls_a=$(find -type d -maxdepth 1)
-	ls_b=()
-	i=0
-	size_cummu="0"
-	
-	
-	#	3.
-	#		- Increase counter on each iteration
-	#		- IF: cumulative size < 15gb, then:
-	#			- Append dir to tmp list
-	#			- ELSE: Once cumulative size < 15gb
-	#				1. Pipe current list to new list file
-	#					- Create name based on dir number range
-	#				2. Reset tmp ls with current dir as 1st arg
-	#					- And set lower dir number for new ls range
-	for dir_i in $ls_a; do
-		i=$(($i+1))
-	
-		if [ -lt "$siz_cumu" 15gb ]; then
-			ls_b+=$dir_i
-	
-			else
-				i_b=$i
-				file_name="dir.$i_a.to.$i_b"
-				printf "$ls_b\n" > $ls_files_dir/$rut
-	
-				i_a=$i
-				ls_b=($dir)
-		fi
-	done
+  # Make lists of dir's based on their cumulative size
+  # TODO: IN PROGRESS
+  # ==============================
+  
+  # 1.
+  #   - Create root associated folder in xfr.subls
+  #   - Remove previous list in that folder if it exisits
+  #   -
+  #   TODO - add if condition to 'remove'
+  #   TODO - make dir if doesn't exist
+  #   TODO - tidy up file/variable names here
+  rut="${1}"
+  ls_files_dir="$XDG_BIN_HOME/fbk/xfr.subls/$rut"
+  rm -R $ls_files_dir/xfr.subls
+  
+  # 2.
+  #   - Change to root dir
+  #   - Create list of all dir's
+  #   - Create empty list to feed them cumulatively into through the next loop
+  #   - Setup a counter
+  cd "${rut}"
+  ls_a=$(find -type d -maxdepth 1)
+  ls_b=()
+  i=0
+  size_cummu="0"
+  
+  
+  # 3.
+  #   - Increase counter on each iteration
+  #   - IF: cumulative size < 15gb, then:
+  #     - Append dir to tmp list
+  #     - ELSE: Once cumulative size < 15gb
+  #       1. Pipe current list to new list file
+  #         - Create name based on dir number range
+  #       2. Reset tmp ls with current dir as 1st arg
+  #         - And set lower dir number for new ls range
+  for dir_i in $ls_a; do
+    i=$(($i+1))
+  
+    if [ -lt "$siz_cumu" 15gb ]; then
+      ls_b+=$dir_i
+  
+      else
+        i_b=$i
+        file_name="dir.$i_a.to.$i_b"
+        printf "$ls_b\n" > $ls_files_dir/$rut
+  
+        i_a=$i
+        ls_b=($dir)
+    fi
+  done
 }
 
 
@@ -150,34 +150,34 @@ bkls() {
 # TODO: TIDY UP
 
 rst_if() {
-	if [ -n "$(grep -Ex "^$1$" "$que_done")" ]; then
-		prntx "que: Completed: $1 \n"
-	else
-		prntx "init snapshot bk ---> $1"
-		rst "$repo" push "$1"
-	fi ;}
+  if [ -n "$(grep -Ex "^$1$" "$que_done")" ]; then
+    prntx "que: Completed: $1 \n"
+  else
+    prntx "init snapshot bk ---> $1"
+    rst "$repo" push "$1"
+  fi ;}
 
 que_rst_y () {
-	repo="$1"
-	
-	que_done="$bkhq_c/que.don"
-	que_todo="$bkhq_c/que.x"
-	
-	todo="$(cat $que_todo)"
-	done="$(cat $que_done)"
+  repo="$1"
+  
+  que_done="$bkhq_c/que.don"
+  que_todo="$bkhq_c/que.x"
+  
+  todo="$(cat $que_todo)"
+  done="$(cat $que_done)"
 
-	for i in $todo; do
-		rst_if "$i"
-	done
+  for i in $todo; do
+    rst_if "$i"
+  done
 }
 
 que_rst_x () {
-	src_dir="t"
-	src_pth="/data/$src_dir"
-	rst gcs push $src_pth
+  src_dir="t"
+  src_pth="/data/$src_dir"
+  rst gcs push $src_pth
 }
 
-#	gcs_mod is for use in places like Bundoran library where many connections may break the network.
+# gcs_mod is for use in places like Bundoran library where many connections may break the network.
 
 case $cmd in
 esac
@@ -185,9 +185,9 @@ esac
 
 # cmd ###############################################
 case $cmd in
-	ls) 			bkls $@;;
-	a) 				que_rst_y gcs ;;
-	b) 				que_rst_y gcsx ;;
-	x) 				que_rst_x ;;
+  ls)       bkls $@;;
+  a)        que_rst_y gcs ;;
+  b)        que_rst_y gcsx ;;
+  x)        que_rst_x ;;
 esac
 

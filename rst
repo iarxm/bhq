@@ -90,17 +90,18 @@ esac
 # cmd ########################################################
 
 case $cmd in
-
+  
+  # custom
 	custom|xx)
 		prnt "choose a custom command"
 		args+=("${@}") ;;
 
-
+  # mount
 	mount|mnt)
 		prnt "mounting repo on $rst_mnt"
 		args+=('mount' 	"$rst_mnt") ;;
 
-
+  # push??
 	push)
 		prnt "partial of /data/" "dirs:" "%40s" "${blue}$(ls ${@})${normal}"
     args+=(	'backup' )
@@ -108,7 +109,7 @@ case $cmd in
     args+=( "--exclude-file" 	"$exl")
     args+=( "${@}" ) ;;
 
-
+  # mid
 	backup-part-mid|bpmid|push-part-mid|psh-mid)
 		prnt "partial of /data/" "dirs:" "" "$(cat ${incl_part_mid})"
     args+=( 'backup' )
@@ -116,7 +117,7 @@ case $cmd in
 		args+=( "--exclude-file" 	"$exl")
     args+=( "--files-from" 	"$incl_part_mid" ) ;;
 
-
+  # min
   push-part-min|backup-part-min|bpmin|p)
 		prnt "partial of /data/" "dirs:"
 		prnt_ls < "${incl_part_min}"
@@ -125,7 +126,7 @@ case $cmd in
     args+=( "--exclude-file" "$exl")
     args+=( "--files-from" "$incl_part_min" ) ;;
 
-
+  # most
   push-part-most|backup-part-most|bpmst)
 		prnt "key user data" "dirs" 
 		prnt_ls "$(cat ${incl_part})"
@@ -134,7 +135,7 @@ case $cmd in
     args+=( '--exclude-file' "$exl" )
     args+=( "--files-from" "$incl_part_mst" ) ;;
 
-
+  # full
   push-full|backup-full|bf)
 		prnt "full bk /data/" "exclude using:" "$(cat ${exl})"
     args+=( 'backup' )
@@ -142,7 +143,7 @@ case $cmd in
     args+=( "--exclude-file" "$exl")
     args+=( "/data/" ) ;;
 
-
+  # forget
   forget|f)
     prnt "forget old snapshots"
     args+=(
@@ -156,7 +157,7 @@ case $cmd in
       "--keep-monthly" "$RETENTION_MONTHS"
       "--keep-yearly" "$RETENTION_YEARS" ) ;;
 
-
+  # forget prune
   forget-prune|fp)
     prnt "forgetting and pruning old snapshots"
     args+=(
@@ -171,15 +172,15 @@ case $cmd in
       "--keep-monthly" "$RETENTION_MONTHS"
       "--keep-yearly" "$RETENTION_YEARS" ) ;;
 
+  # vcs xda
+	version-control-xds|vc-xds|vcs-xds|xds)
+		prnt "vcs equivalent for ~/xdsa/"
+		args+=( 'backup' )
+		args+=( '--tag' 'xds' )
+  	args+=( '/data/ux/dsa/' '/data/ux/dsb/' ) ;;
 
-	version-control-xds|vc-xds)
-		prnt "vcs equivalent for ~/xds/"
-		args+=( 								'backup' )
-		args+=( '--tag' 				'xds' )
-  	args+=( 								'/data/ux/ds/' ) ;;
 
-
-  *)
+  *) # help
     prnt \
 			"arg2: restic cmd. options:" \
     	"- bp 	| backup-partial of /data/" \
