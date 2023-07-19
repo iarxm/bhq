@@ -5,17 +5,20 @@
 # Author/Modifier: Iarom Madden
 #
 # RESTIC BACKUPS
+#
+##########################################
 
+# init
 
-# init ##########################################
 #set -e -o pipefail
 rep="$1"
 cmd="$2"
 shift 2
 
 args=()
+opt=()
 
-bkhq_c="$HOME/.config/bkhq"
+bkhq_c="${XDG_CONFIG_HOME}/bkhq"
 
 exl="$bkhq_c/exl"
 incl="$bkhq_c/inc"
@@ -199,5 +202,4 @@ prnt_args "restic" "${args[@]}${yellow}"
 restic "${args[@]}"
 
 prnt_fin
-
 

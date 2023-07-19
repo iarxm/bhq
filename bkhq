@@ -49,7 +49,9 @@ bk_sys_prepare() {
 # bksq ##################################################
 
 local_vcs_ax()        { rst lca bpmin; }
+
 local_vcs_ay()        { rst lca vc-xds; }
+
 remote_partial_min()  { yes | rst gcs bpmin; } # remote - part.min
 
 local_vcs_a() { # local version control
@@ -63,8 +65,10 @@ regular_b() { # regular essentials
 
 device_a() {
   prnt "starting bkp: '''dva's'''"
-  brg dva bf
-  rsn dva ;} #rs dva.pmin
+  brg dva bf ;} #todo: keys
+  
+device_ax() { # required sudo
+  rsn dva ; } #rs dva.pmin
 
 device_b() {
   # disk too full: choose between brg or rsn backup just for this one. And choose a partial set of /data
