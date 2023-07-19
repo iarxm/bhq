@@ -29,7 +29,7 @@ incl_part_mst="$bkhq_c/inc.part.mst"
 rst_mnt="$HOME/.local/share/amnt/xbk.rst/"
 hostname="$HOST"
 
-rst_env="$XDG_CONFIG_HOME/restic"
+rst_env="$HOME/.config/restic"
 env_lca="$rst_env/env.lca"
 env_dva="$rst_env/env.dva"
 env_dvb="$rst_env/env.dvb"
