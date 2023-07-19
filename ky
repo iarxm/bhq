@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# Author: Iarom Madden
+
+
+# init ##############################
+
+rep=${1}
+cmd=${2}
+shift 2
+
+gpg_dir="$HOME/.local/share/gnupg"
+mnt_x="$HOME/zm/zm"
+
+prnt_h1() { printf "KY: %s\n" "########################" "$1"; }
+
+prnt_h2()	{ printf "KY: %s\n" "----------------------" "$1"; }
+
+prnt() 		{ printf "KY: %s\n" "$1"; }
+
+mkgpg() {
+	prnt "no gpg dir, creating it..."
+	gpgconf --kill gpg-agent
+	mkdir "$gpg_dir"
+	chmod 700 "$gpg_dir" ;}
+
+prnt_h1 "init ky sciprt..."
+
+[ -d "$gpg_dir" ] || mkgpg
+
+
+# repo ###############################
+
+case ${rep} in
+	dva) repo="$mnt_x.key" ;;
+	dvb) repo="$HOME/zm/dvb/.key" ;;
+	dvc)
+		printf "TODO \n" && exit
+		repo="$HOME/zm/dvc/.key" ;;
+	dvd)
+		printf "TODO \n" && exit
+		repo="$HOME/zm/dvd/.key" ;;
+	lca)
+		printf "TODO \n" && exit
+		repo="$HOME/.config/key" ;;
+esac
+
+
+# bk exp ########################################
+
+gpg_bk_pub() 		{ 
+	gpg --export --armor --export-options \
+		backup --output "$repo/pubkeys.asc"; }
+
+gpg_bk_prv() 		{ 
+	gpg --export-secret-keys --armor --export-options \
+		backup --output "$repo/privatekeys.asc"; }
+
+gpg_bk_trust() 	{ 
+	gpg --export-ownertrust > "$repo/ownertrust.txt"; }
+
+gpg_bk() {
+	gpg_bk_pub
+	gpg_bk_prv
+	gpg_bk_trust ; }
+
+
+# imp restore #####################################
+
+gpg_imp_pub() {
+	prnt_h2 "importing Public Keys"
+	gpg --import --import-options restore "$repo/pubkeys.asc" ; }
+
+gpg_imp_priv() {
+	prnt_h2 "importing Private Keys"
+	gpg --import --import-options restore "$repo/privatekeys.asc" ;}
+
+gpg_imp_test() {
+	prnt_h2 "checking that Secret keys were imported"
+	gpg -K
+	
+	prnt_h2 "checking that public keys were imported"
+	gpg -k ; }
+
+gpg_imp_trust() {
+	printf "importing ownertrust"
+			gpg --import-ownertrust --import-options restore $repo/ownertrust.txt ;}
+	
+gpg_imp_finish() {
+		prnt_h1 "Test encryption/decryption as the new user with the imported keys with:"
+		prnt "gpg -er USERID"
+		prnt "gpg -d"
+		prnt "Don't su over to the new user; login directly via ssh or console; Otherwise decryption and signing will likely fail, if the user doesnt own the shell.." ;}
+
+gpg_imp() {
+	gpg_imp_pib
+	gpg_imp_priv
+	gpg_imp_test
+
+	gpg_imp_trust
+	gpg_imp_finish ; }
+
+
+# case ###########################################
+
+case ${cmd} in
+	exp) gpg_bk ;;
+	imp) gpg_imp ;;
+esac
+

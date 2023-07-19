@@ -1,0 +1,137 @@
+#!/bin/env bash
+
+# TODO: 
+# - make like the rst version? Maybe not because for some destinations only one operation will be relevant and other operations would destroy the state
+# - for more clarity, the operations will be defined by the destination or in some cases the source?
+
+# todo: decompose repeating code: vars can be declared by a function call with declare -g
+
+rc_cp() { rclone copy "$src" "$dst" -vP $opt; }
+
+rc_cpx() { src="$1"; dst="$2"; shift 2; opt="$@"; rc_cp ;} #--exclude-from "$exl" \
+
+rc_mv() { rclone move "$src" "$dst" -vP --track-renames $opt; } #		--exclude-from "$exl" \
+
+rc_mvx() { src="$1"; dst="$2"; shift 2; opt="$@"; rc_mv; }
+
+rc_mnt() { rclone mount "$src" "$dst" $opt & }
+
+mnt_p="$HOME/.local/share"
+
+case $dst in 
+	cp) 			rc_cpx $@ ;;
+	mv)				rc_mvx $@ ;;
+	mnt.g1) 	rc_mnt g1:/ "$mnt_p/g1" ;;
+	syc.sybk.dup.sy.was-a)
+		# Should i move this to the 'dup' relevant script??
+		src="/data/.bkp/zsy/dup.syarch1/"
+		dst="wasabi1:bkp.sy1.dup"
+		opt="$@"
+		
+		rclone sync \
+		 	-vP $opt \
+			$src \
+			$dest
+		;;
+	syc)
+		src="$1"
+		dst="$2"
+		opt="$3"
+		exl="$4"
+		#TODO
+		#- include switch for 'exl'??
+		rclone sync \
+				-vP $opt \
+				--track-renames \
+				"$src" \
+				"$dst"
+				#--exclude-from "$exl" \
+		;;
+esac
+
+
+#######################################
+case $cmd in
+	syc.g)
+		src="/data/u/"
+		dst="g1:syc/"
+		exl="/home/iao/.local/bin/bk/dtls.u.exl"
+		
+		pul="g1:spul/"
+		pul_cp="g1:syc/ffpul/"
+		pul_slave="/data/u/ffpul/"
+		
+		opt="$1"
+		rccp "$pul" "$pul_cp" "$opt"
+		rcmv "$pul" "$pul_slave" "$opt"
+		rcsyc "$src" "$dst" "$exl" "$opt"
+		rcsyc "$src" "$dst" "$exl" "$opt"
+		;;
+
+
+	syc.sycls)
+		src_root="$1"
+		src_ls_file="$2"
+		dst_root="$3"
+		opt="$4"
+		
+		## fc ==============
+		rc_for() {
+			src_root="$1"
+			src_ls_file="$2"
+			dst_root="$3"
+			opt="$4"
+
+			src_ls=$(cat $src_ls_file)
+			cd $src_root
+	
+			for src in $src_ls; do
+			  src_path=$(readlink $src)
+
+			  if [ -d $src ]; then
+			    rclone sync \
+			    	-vP $opt \
+			    	--track-renames \
+			    	"$src_path/" \
+			    	"$dst_root/$(basename $src)/"
+			  fi
+			done
+		}
+		## 'if' test above is important for filtering out list items which arent directories 
+		## - each a typo which leads to the list item being root - rclone then syncs the whole contents of root..
+
+		## exc ===========
+		rc_for $src_root \
+			$src_ls_file \
+			$dst_root $opt
+	;;
+
+	syc.lsa.g)	
+		src_root="/home/$USER/"
+		src_ls_file="/home/$USER/.local/bin/bk/dtlsaa"
+		dst_root="gdrive1:/syc"
+		opt=$1
+
+		## exc =================
+		rcsycls \
+			$src_root \
+			$src_ls_file \
+			$dst_root $opt
+	
+	;;
+	syc.lsa.stj)
+		#!/bin/sh
+		src_root="/home/$USER/"
+		src_ls_file="/home/$USER/.local/bin/bkdtlsaa"
+		dst_root="storj1:/sync/"
+		opt=$1
+		rcsycls \
+			$src_root \
+			$src_ls_file \
+			$dst_root \
+			$opt
+	;;
+
+esac
+
+

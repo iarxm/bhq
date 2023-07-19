@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# #####################################
+# AUTHOR: Iarom Madden future@iarom.org
+#
+# BORG MODS
+#
+# #####################################
+set -e -o pipefail
+rep="$1"
+cmd="$2"
+shift 2
+
+args=()
+opt+=()
+
+bkhq_c="$HOME/.config/bkhq"
+
+exl="$bkhq_c/exl"
+incl="$bkhq_c/inc"
+incl_part_mid="$bkhq_c/inc.part"
+incl_part_min="$bkhq_c/inc.part.min"
+incl_part_mst="$bkhq_c/inc.part.mst"
+
+rst_mnt="$HOME/.local/share/amnt/xbk.brg/"
+
+hostname="$HOST"
+
+# TODO: move (use same method of sourcing as rst script)
+dva="$HOME/zm/zm/dva/.brg/"
+dvb="$HOME/zm/zm/dvb/.brg/"
+lca="/data/.bk/brg"
+
+prnt_h1() { printf "BRG: %s \n" "################################" $@; }
+
+prnt() 		{ printf "BRG: %s \n" $@; }
+
+rep_set() { export BORG_REPO="$1" && prnt_h1 "$2: $BORG_REPO" ;}
+
+# rep #################################
+case "${rep}" in
+	dva) rep_set $dva "device_a" ;;
+	dvb) rep_set $dvb "device_b" ;;
+	lca) prnt "lca: TODO" && exit
+		rep_set $lca "local_a" ;;
+	was.a) prnt "was.a is TODO \n" &&exit
+		rep_set $rem_was "wasabi_a"
+		nm_mobile; exit 1; ;;
+	*) prnt "repo required" && exit
+esac
+
+
+# cmd ##################################
+case ${cmd} in
+	custom|xx) 
+		prnt "choose a custom command.." ""
+		args+=( "${@}" ) ;;
+
+	mount|mnt) 
+		prnt "mount (todo).." "" && exit ;;
+		#args+=('mount' 					'/home/iao/zs/xbk.rst/')
+
+	backup-full|bf)
+    prnt "src: full home: '/data/'" "excl: ${exl}:" ""
+    args+=( 'create' )
+		args+=( '-s' )
+		args+=( '--progress' )
+		args+=( "--exclude-from"	"$exl")
+		args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
+    args+=( "/data/" )
+		args+=( "${@}" 	) ;;
+
+	part) 
+		#"Partial Home Backup # TODO
+		;;
+	
+	*) prnt "no cmd" && exit ;;
+esac
+
+
+prnt "run:" "borg" "${args[@]}" ""
+
+borg "${args[@]}"
+

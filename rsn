@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# ########################################
+# Author: Iarom Madden
+#
+#
+# ########################################
+
+case $1 in
+	aa) sudo rsnapshot ahourly ;;
+	dva) sudo rsnapshot -c "/etc/rsnapshot.d1.conf" alpha ;;
+	dvb) sudo rsnapshot -c "/etc/rsnapshot.d2.conf" alpha ;;
+esac
+
