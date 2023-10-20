@@ -2,26 +2,35 @@
 # Author: Iarom Madden
 
 
-# init ##############################
+# declare ##############################
 
 rep=${1}
 cmd=${2}
 shift 2
 
 gpg_dir="$HOME/.local/share/gnupg"
-mnt_x="$HOME/zm/zm"
+mnt_x="$HOME/jf/zm"
 
-prnt_h1() { printf "KY: %s\n" "########################" "$1"; }
+prnt_h1() { printf "KY: %s\n" " " "########################" "$1"; }
 
-prnt_h2()	{ printf "KY: %s\n" "----------------------" "$1"; }
+prnt_h2() { printf "KY: %s\n" "----------------------" "$1"; }
 
-prnt() 		{ printf "KY: %s\n" "$1"; }
+prnt()    { printf "KY: %s\n" "$1"; }
 
-mkgpg() {
+prnt_ln() { printf "\n"; }
+
+mkgpg()   {
 	prnt "no gpg dir, creating it..."
 	gpgconf --kill gpg-agent
 	mkdir "$gpg_dir"
+	ln -s $gpg_dir $HOME/.gnupg
 	chmod 700 "$gpg_dir" ;}
+
+# init ##############################
+
+[ "$rep" ] || { prnt "no repo provided"; exit; }
+
+[ "$cmd" ] || { prnt "no cmd provided"; exit; }
 
 prnt_h1 "init ky sciprt..."
 
@@ -31,14 +40,14 @@ prnt_h1 "init ky sciprt..."
 # repo ###############################
 
 case ${rep} in
-	dva) repo="$mnt_x.key" ;;
-	dvb) repo="$HOME/zm/dvb/.key" ;;
+	dva) repo="$mnt_x/dva/.key" ;;
+	dvb) repo="$mnt_x/dvb/.key" ;;
 	dvc)
 		printf "TODO \n" && exit
-		repo="$HOME/zm/dvc/.key" ;;
+		repo="$mnt_x/dvc/.key" ;;
 	dvd)
 		printf "TODO \n" && exit
-		repo="$HOME/zm/dvd/.key" ;;
+		repo="$mnt_x/dvd/.key" ;;
 	lca)
 		printf "TODO \n" && exit
 		repo="$HOME/.config/key" ;;
@@ -82,17 +91,17 @@ gpg_imp_test() {
 	gpg -k ; }
 
 gpg_imp_trust() {
-	printf "importing ownertrust"
-			gpg --import-ownertrust --import-options restore $repo/ownertrust.txt ;}
+    prnt_h2 "importing ownertrust"
+    gpg --import-ownertrust --import-options restore $repo/ownertrust.txt ;}
 	
 gpg_imp_finish() {
-		prnt_h1 "Test encryption/decryption as the new user with the imported keys with:"
-		prnt "gpg -er USERID"
-		prnt "gpg -d"
-		prnt "Don't su over to the new user; login directly via ssh or console; Otherwise decryption and signing will likely fail, if the user doesnt own the shell.." ;}
+	prnt_h1 "Test encryption/decryption as the new user with the imported keys with:"
+	prnt "gpg -er USERID"
+	prnt "gpg -d"
+	prnt "Don't su over to the new user; login directly via ssh or console; Otherwise decryption and signing will likely fail, if the user doesnt own the shell.." ;}
 
 gpg_imp() {
-	gpg_imp_pib
+	gpg_imp_pub
 	gpg_imp_priv
 	gpg_imp_test
 
@@ -106,4 +115,6 @@ case ${cmd} in
 	exp) gpg_bk ;;
 	imp) gpg_imp ;;
 esac
+
+prnt_ln
 
