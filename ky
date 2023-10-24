@@ -40,34 +40,29 @@ prnt_h1 "init ky sciprt..."
 # repo ###############################
 
 case ${rep} in
-	dva) repo="$mnt_x/dva/.key" ;;
-	dvb) repo="$mnt_x/dvb/.key" ;;
-	dvc)
-		printf "TODO \n" && exit
-		repo="$mnt_x/dvc/.key" ;;
-	dvd)
-		printf "TODO \n" && exit
-		repo="$mnt_x/dvd/.key" ;;
-	lca)
-		printf "TODO \n" && exit
-		repo="$HOME/.config/key" ;;
+	dva) repo="$mnt_x/dva/zb/ky" ;;
+	dvb) repo="$mnt_x/dvb/zb/ky" ;;
+	dvc) repo="$mnt_x/dvc/zb/ky" ;;
+	#dvd) repo="$mnt_x/dvd/.key" ;;
+  dua) repo="$mnt_x/dua/zb/ky" ;;
+  dub) repo="$mnt_x/dua/zb/ky" ;;
+  duc) repo="$mnt_x/dua/zb/ky" ;;
+	#rma) repo="$HOME/.config/key" ;; # remoe a : todo: systemitise using shamir's algorithm
 esac
 
 
 # bk exp ########################################
 
-gpg_bk_pub() 		{ 
-	gpg --export --armor --export-options \
-		backup --output "$repo/pubkeys.asc"; }
+gpg_bk_init()   { mkdir -p $repo; chmod 700 "$repo"; }
 
-gpg_bk_prv() 		{ 
-	gpg --export-secret-keys --armor --export-options \
-		backup --output "$repo/privatekeys.asc"; }
+gpg_bk_pub()   { gpg --export --armor --export-options backup --output "$repo/pubkeys.asc"; }
 
-gpg_bk_trust() 	{ 
-	gpg --export-ownertrust > "$repo/ownertrust.txt"; }
+gpg_bk_prv()   { gpg --export-secret-keys --armor --export-options backup --output "$repo/privatekeys.asc"; }
+
+gpg_bk_trust() { gpg --export-ownertrust > "$repo/ownertrust.txt"; }
 
 gpg_bk() {
+  gpg_bk_init
 	gpg_bk_pub
 	gpg_bk_prv
 	gpg_bk_trust ; }
@@ -91,8 +86,8 @@ gpg_imp_test() {
 	gpg -k ; }
 
 gpg_imp_trust() {
-    prnt_h2 "importing ownertrust"
-    gpg --import-ownertrust --import-options restore $repo/ownertrust.txt ;}
+  prnt_h2 "importing ownertrust"
+  gpg --import-ownertrust --import-options restore $repo/ownertrust.txt ;}
 	
 gpg_imp_finish() {
 	prnt_h1 "Test encryption/decryption as the new user with the imported keys with:"
