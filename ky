@@ -9,7 +9,7 @@ cmd=${2}
 shift 2
 
 gpg_dir="$HOME/.local/share/gnupg"
-mnt_x="$HOME/jf/zm"
+bkhq_c="$HOME/.config/bkhq"
 
 prnt_h1() { printf "KY: %s\n" " " "########################" "$1"; }
 
@@ -46,7 +46,7 @@ prnt_h1 "init ky sciprt..."
 
 # repo ###############################
 
-env_set()     { . $1 && prnt_h1 "$2: $KY_REPO {$BORG_PASSCOMMAND}"; }
+env_set()     { . $1 && prnt_h1 "$2: $KY_REPO"; }
 
 case ${rep} in
 	dva) env_set $env_dva "dva" ;;
@@ -70,11 +70,14 @@ gpg_bk_prv()   { gpg --export-secret-keys --armor --export-options backup --outp
 
 gpg_bk_trust() { gpg --export-ownertrust > "$KY_REPO/ownertrust.txt"; }
 
+gpg_ls_bk() { ls -al "$KY_REPO/"; }
+
 gpg_bk() {
   gpg_bk_init
 	gpg_bk_pub
 	gpg_bk_prv
-	gpg_bk_trust ; }
+	gpg_bk_trust
+  gpg_ls_bk ; }
 
 
 # imp restore #####################################
@@ -116,8 +119,8 @@ gpg_imp() {
 # case ###########################################
 
 case ${cmd} in
-	exp) gpg_bk ;;
-	imp) gpg_imp ;;
+	exp|bk|bkp)    gpg_bk ;;
+	imp)           gpg_imp ;;
 esac
 
 prnt_ln
