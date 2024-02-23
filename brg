@@ -26,7 +26,7 @@ incl_part_mid="$bkhq_c/inc.part"
 incl_part_min="$bkhq_c/inc.part.min"
 incl_part_mst="$bkhq_c/inc.part.mst"
 
-brg_mnt="$HOME/.local/share/amnt/xbk.brg/"
+brg_mnt="$HOME/.local/share/aaa/xbk.brg/"
 
 hostname="$HOST"
 
@@ -34,6 +34,7 @@ env_dva="$bkhq_c/env.dva"
 env_dvb="$bkhq_c/env.dvb"
 env_lca="$bkhq_c/env.lca"
 
+src="/dat"
 
 # print ############################
 
@@ -58,6 +59,7 @@ env_set_rem() { nm_mobile && exit 1; env_set "$1" "$2"; } # todo
 case "${rep}" in
 	dva) env_set $env_dva "device_a" ;;
 	dvb) env_set $env_dvb "device_b" ;;
+  # todo
 	lca) prnt "lca: TODO" && exit
 		env_set $env_lca "local_a" ;;
 	was.a) prnt "was.a is TODO \n" && exit
@@ -85,24 +87,24 @@ case ${cmd} in
 		args+=("$brg_mnt") ;; # mnt point
 
 	backup-full|bf)
-    prnt "src: full '/data/'" "exl: ${exl}:" ""
+    prnt "src: full '$src/'" "exl: ${exl}:" ""
     args+=( 'create' )
 		args+=( '--stats' )
 		args+=( '--progress' )
 		args+=( "--exclude-from"	"$exl_a")
 		args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
-    args+=( "/data/" )
+    args+=( "$src/" )
 		args+=( "${@}" 	) ;;
 
   backup-mid|bk-mid)
-    prnt "src: partial.mid '/data/'" "exl: ${exl_a} & ${exl_b}:"
+    prnt "src: partial.mid '$src/'" "exl: ${exl_a} & ${exl_b}:"
     args+=( 'create' )
 		args+=( '--stats' )
 		args+=( '--progress' )
     args+=( "--exclude-from"	"$exl_b")
 		args+=( "--exclude-from"	"$exl_a")
 		args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
-    args+=( "/data/" )
+    args+=( "$src/" )
 		args+=( "${@}" 	) ;;
 
   #"Partial Home Backup # TODO

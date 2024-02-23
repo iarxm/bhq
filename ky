@@ -19,6 +19,13 @@ prnt()    { printf "KY: %s\n" "$1"; }
 
 prnt_ln() { printf "\n"; }
 
+env_dva="$bkhq_c/env.dva"
+env_dvb="$bkhq_c/env.dvb"
+env_dvc="$bkhq_c/env.dvc"
+env_dua="$bkhq_c/env.dua"
+env_dub="$bkhq_c/env.dub"
+env_duc="$bkhq_c/env.duc"
+
 mkgpg()   {
 	prnt "no gpg dir, creating it..."
 	gpgconf --kill gpg-agent
@@ -39,27 +46,29 @@ prnt_h1 "init ky sciprt..."
 
 # repo ###############################
 
+env_set()     { . $1 && prnt_h1 "$2: $KY_REPO {$BORG_PASSCOMMAND}"; }
+
 case ${rep} in
-	dva) repo="$mnt_x/dva/zb/ky" ;;
-	dvb) repo="$mnt_x/dvb/zb/ky" ;;
-	dvc) repo="$mnt_x/dvc/zb/ky" ;;
-	#dvd) repo="$mnt_x/dvd/.key" ;;
-  dua) repo="$mnt_x/dua/zb/ky" ;;
-  dub) repo="$mnt_x/dua/zb/ky" ;;
-  duc) repo="$mnt_x/dua/zb/ky" ;;
-	#rma) repo="$HOME/.config/key" ;; # remoe a : todo: systemitise using shamir's algorithm
+	dva) env_set $env_dva "dva" ;;
+	dvb) env_set $env_dvb "dvb" ;;
+	dvc) env_set $env_dvc "dvc" ;;
+	#dvd) KY_REPO="$mnt_x/dvd/.key" ;;
+  dua) env_set $env_dua "dua" ;;
+  dub) env_set $env_dub "dub" ;;
+  duc) env_set $env_duc "duc" ;;
+	#rma) KY_REPO="$HOME/.config/key" ;; # remoe a : todo: systemitise using shamir's algorithm
 esac
 
 
 # bk exp ########################################
 
-gpg_bk_init()   { mkdir -p $repo; chmod 700 "$repo"; }
+gpg_bk_init()   { mkdir -p $KY_REPO; chmod 700 "$KY_REPO"; }
 
-gpg_bk_pub()   { gpg --export --armor --export-options backup --output "$repo/pubkeys.asc"; }
+gpg_bk_pub()   { gpg --export --armor --export-options backup --output "$KY_REPO/pubkeys.asc"; }
 
-gpg_bk_prv()   { gpg --export-secret-keys --armor --export-options backup --output "$repo/privatekeys.asc"; }
+gpg_bk_prv()   { gpg --export-secret-keys --armor --export-options backup --output "$KY_REPO/privatekeys.asc"; }
 
-gpg_bk_trust() { gpg --export-ownertrust > "$repo/ownertrust.txt"; }
+gpg_bk_trust() { gpg --export-ownertrust > "$KY_REPO/ownertrust.txt"; }
 
 gpg_bk() {
   gpg_bk_init
@@ -72,11 +81,11 @@ gpg_bk() {
 
 gpg_imp_pub() {
 	prnt_h2 "importing Public Keys"
-	gpg --import --import-options restore "$repo/pubkeys.asc" ; }
+	gpg --import --import-options restore "$KY_REPO/pubkeys.asc" ; }
 
 gpg_imp_priv() {
 	prnt_h2 "importing Private Keys"
-	gpg --import --import-options restore "$repo/privatekeys.asc" ;}
+	gpg --import --import-options restore "$KY_REPO/privatekeys.asc" ;}
 
 gpg_imp_test() {
 	prnt_h2 "checking that Secret keys were imported"
@@ -87,7 +96,7 @@ gpg_imp_test() {
 
 gpg_imp_trust() {
   prnt_h2 "importing ownertrust"
-  gpg --import-ownertrust --import-options restore $repo/ownertrust.txt ;}
+  gpg --import-ownertrust --import-options restore $KY_REPO/ownertrust.txt ;}
 	
 gpg_imp_finish() {
 	prnt_h1 "Test encryption/decryption as the new user with the imported keys with:"
