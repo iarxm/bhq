@@ -86,12 +86,12 @@ case ${cmd} in
 		args+=('umount')
 		args+=("$brg_mnt") ;; # mnt point
 
-	backup-full|bf)
+	backup-full|full|bf)
     prnt "src: full '$src/'" "exl: ${exl}:" ""
     args+=( 'create' )
-		args+=( '--stats' )
-		args+=( '--progress' )
-		args+=( "--exclude-from"	"$exl_a")
+    args+=( '--stats' )
+    args+=( '--progress' )
+    args+=( "--exclude-from"	"$exl_a")
 		args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
     args+=( "$src/" )
 		args+=( "${@}" 	) ;;
