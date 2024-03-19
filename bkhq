@@ -1,13 +1,12 @@
 #!/bin/env bash
 # vim:ft=sh
-# #######################################
 # Author: Iarom Madden
-#
+# Backups main script
 # #######################################
 
 _init() {
-  bkpath="$HOME/.local/bin/fbk"
-  export PATH="$bkpath:$PATH"
+  #bkpath="$HOME/.local/bin/fbk"
+  #export PATH="$bkpath:$PATH"
   bkhq_c="$HOME/.config/bkhq"
   pkg_ls_dir="$HOME/.config/A.CONTROL/lsx" ;}
 
@@ -65,6 +64,9 @@ _dev_ext_eba() {
   brg dvb bk-mid ;} #rsn dvb #rs dvb.pmin
 _dev_ext_ecc_aaa() { echo "";} # todo
 
+
+# schedules
+
 _reg_aaa() {
   _dev_lcl_vcs_xaa; }
 
@@ -104,8 +106,7 @@ _rst_que_init() {
 
 _rst_que_x () {
   _rst_que_init $1
-  _rst_que_main
-   }
+  _rst_que_main ;}
 
 que_rst_x () { #?
   src_dir="t"
@@ -114,12 +115,6 @@ que_rst_x () { #?
 
 # gcs_mod is for use in places like Bundoran library where many connections may break the network.
 
-# TODO #########################
-# ADD TO NOTES:
-# diskb: disk too full: choose between brg or rsn backup just for this one. And choose a partial set of /data
-# do keys manually as not necessary to continously back them up. Once every while is enough, and automated backups in this regard may actually overwrite the required backup in case of local corruption.
-# todo - configure way of selecting more formally
-#   - perhaps a python script with the creation of class would allow for the import of specific commands to apply to specifically defined devices
 # bkls ####################################################
 
 bkls() {
@@ -206,5 +201,10 @@ _main $@
 # type: device or another thing altogether
 # type_location: eg specific device
 # method: specific functions/algorithms/technologies - eg composite of different restic and borg commands to associate with a specific device like an external drive designated for a particular function
-
+# TODO #########################
+# ADD TO NOTES:
+# diskb: disk too full: choose between brg or rsn backup just for this one. And choose a partial set of /data
+# do keys manually as not necessary to continously back them up. Once every while is enough, and automated backups in this regard may actually overwrite the required backup in case of local corruption.
+# todo - configure way of selecting more formally
+#   - perhaps a python script with the creation of class would allow for the import of specific commands to apply to specifically defined devices
 
