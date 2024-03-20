@@ -4,11 +4,13 @@
 # Author: Iarom Madden
 #
 # #######################################
+
 cmd="$1" && shift 1
 bkpath="$HOME/.local/bin/fbk"
 export PATH="$bkpath:$PATH"
 bkhq_c="$HOME/.config/bkhq"
 pkg_ls_dir="$HOME/.config/A.CONTROL/lsx"
+
 
 # decomp #############################################
 
@@ -45,6 +47,7 @@ bk_sys_prepare() {
   printf "%s\n" $lsm > "/etc/ll/pacmanls$date.m.txt"
   printf "%s\n" $lsn > "$pkg_ls_dir/$date.n.txt"
   printf "%s\n" $lsm > "$pkg_ls_dir/$date.m.txt" ;}
+
 
 # bksq ##################################################
 
@@ -94,44 +97,46 @@ esac
 
 
 # bkls ####################################################
+# Make lists of dir's based on their cumulative size
+# TODO: IN PROGRESS
+# ==============================
+  
+# 1.
+#- Create root associated folder in xfr.subls
+#- Remove previous list in that folder if it exisits
+#-
+#TODO - add if condition to 'remove'
+#TODO - make dir if doesn't exist
+#TODO - tidy up file/variable names here
+
+# 2.
+#   - Change to root dir
+#   - Create list of all dir's
+#   - Create empty list to feed them cumulatively into through the next loop
+#   - Setup a counter
+
+# 3.
+#   - Increase counter on each iteration
+#   - IF: cumulative size < 15gb, then:
+#     - Append dir to tmp list
+#     - ELSE: Once cumulative size < 15gb
+#       1. Pipe current list to new list file
+#         - Create name based on dir number range
+#       2. Reset tmp ls with current dir as 1st arg
+#         - And set lower dir number for new ls range
 
 bkls() {
-  # Make lists of dir's based on their cumulative size
-  # TODO: IN PROGRESS
-  # ==============================
   
-  # 1.
-  #   - Create root associated folder in xfr.subls
-  #   - Remove previous list in that folder if it exisits
-  #   -
-  #   TODO - add if condition to 'remove'
-  #   TODO - make dir if doesn't exist
-  #   TODO - tidy up file/variable names here
   rut="${1}"
   ls_files_dir="$XDG_BIN_HOME/fbk/xfr.subls/$rut"
   rm -R $ls_files_dir/xfr.subls
   
-  # 2.
-  #   - Change to root dir
-  #   - Create list of all dir's
-  #   - Create empty list to feed them cumulatively into through the next loop
-  #   - Setup a counter
-  cd "${rut}"
+    cd "${rut}"
   ls_a=$(find -type d -maxdepth 1)
   ls_b=()
   i=0
   size_cummu="0"
   
-  
-  # 3.
-  #   - Increase counter on each iteration
-  #   - IF: cumulative size < 15gb, then:
-  #     - Append dir to tmp list
-  #     - ELSE: Once cumulative size < 15gb
-  #       1. Pipe current list to new list file
-  #         - Create name based on dir number range
-  #       2. Reset tmp ls with current dir as 1st arg
-  #         - And set lower dir number for new ls range
   for dir_i in $ls_a; do
     i=$(($i+1))
   
@@ -149,8 +154,8 @@ bkls() {
   done
 }
 
-
 # QUES ##############################################
+
 # TODO: TIDY UP
 
 rst_if() {
