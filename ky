@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Author: Iarom Madden
 
-
-# declare ##############################
+# init ##############################
 
 rep=${1}
 cmd=${2}
