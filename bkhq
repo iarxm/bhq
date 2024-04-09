@@ -113,7 +113,7 @@ que_rst_x () { #?
   src_pth="/data/$src_dir"
   rst gcs push $src_pth ;}
 
-# gcs_mod is for use in places like Bundoran library where many connections may break the network.
+# gcs_mod: for use in eg Bundoran library where many connections may break network.
 
 # bkls ####################################################
 
@@ -171,13 +171,13 @@ _index() {
   tga)      _reg_aaa;; # very regular essentialls
   tgb)      _reg_aab;;
   laa)      _dev_lcl_vcs_aaa;; # local version control
-  dva)      _dev_ext_eaa;;
-  dvb)      _dev_ext_eab;;
+  dva)      _dev_eaa;;
+  dvb)      _dev_eba;;
   raa)      _dev_rem_par_min;;
   # maint ###################
   pre)      _bk_sys_prepare;;
-  ky.c)     ky dvc exp ;;
-  ky.d)     ky dvd exp ;;
+  ky.c)     kys dvc exp ;;
+  ky.d)     kys dvd exp ;;
   notif)    _notif ;;
   # ########################
   ls)       bkls $@;;
