@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
-
-# #####################################
 # AUTHOR: Iarom Madden future@iarom.org
-#
 # BORG MODS
-#
-# #####################################
 
 # init
 
@@ -19,12 +14,12 @@ opt=()
 
 bkhq_c="${HOME}/.config/bkhq"
 
-exl_a="$bkhq_c/exl"
+exl_a="$bkhq_c/exla"
 exl_b="$bkhq_c/exlb"
-incl="$bkhq_c/inc"
-incl_part_mid="$bkhq_c/inc.part"
-incl_part_min="$bkhq_c/inc.part.min"
-incl_part_mst="$bkhq_c/inc.part.mst"
+icl="$bkhq_c/inc"
+icl_part_mid="$bkhq_c/inc.part"
+icl_part_min="$bkhq_c/inc.part.min"
+icl_part_mst="$bkhq_c/inc.part.mst"
 
 brg_mnt="$HOME/.local/share/aaa/xbk.brg/"
 
