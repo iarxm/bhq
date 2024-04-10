@@ -14,6 +14,8 @@ opt=()
 
 bkhq_c="${HOME}/.config/bkhq"
 
+#todo: move some of below to config files
+
 exl_a="$bkhq_c/exla"
 exl_b="$bkhq_c/exlb"
 icl="$bkhq_c/inc"
@@ -21,15 +23,17 @@ icl_part_mid="$bkhq_c/inc.part"
 icl_part_min="$bkhq_c/inc.part.min"
 icl_part_mst="$bkhq_c/inc.part.mst"
 
-brg_mnt="$HOME/.local/share/aaa/xbk.brg/"
+brg_mnt="$HOME/.local/share/aaa/mnt/xbk.brg/"
 
 hostname="$HOST"
 
 env_dva="$bkhq_c/env.dva"
 env_dvb="$bkhq_c/env.dvb"
+env_dvx="$bkhq_c/env.dvx"
 env_lca="$bkhq_c/env.lca"
 
 src="/dat"
+
 
 # print ############################
 
@@ -37,13 +41,14 @@ blue=$(tput setaf 4)
 normal=$(tput sgr0)
 yellow=$(tput setaf 3)
 
-prnt_ln() 	{ printf "\n"; }
+prnt_ln()   	{ printf "\n"; }
 
 prnt_h1()     { printf "BRG: %s \n" "################################" "$1"; }
 
 prnt() 		    { printf "BRG: %s \n" "$1"; }
 
 prnt_args()   { prnt_ln; prnt "$1"; shift 1; printf "BRG:   %s \n" "$@"; prnt_ln; }
+
 
 # rep #################################
 
@@ -54,6 +59,7 @@ env_set_rem() { nm_mobile && exit 1; env_set "$1" "$2"; } # todo
 case "${rep}" in
 	dva) env_set $env_dva "device_a" ;;
 	dvb) env_set $env_dvb "device_b" ;;
+  dvx) env_set $env_dvx "device_x" ;;
   # todo
 	lca) prnt "lca: TODO" && exit
 		env_set $env_lca "local_a" ;;
@@ -66,17 +72,23 @@ esac
 # cmd ##################################
 
 case ${cmd} in
-	custom|xx) 
+	custom|xx)
 		prnt "choose a custom command.." ""
 		args+=( "${@}" ) ;;
 
-	mount|mnt) 
+  init)
+		prnt "init" ""
+		args+=( 'init')
+    args+=( '--encryption' 'repokey-blake2')
+    args+=( "${@}" 	) ;;
+
+	mount|mnt|m)
 		prnt "mount: $brg_mnt" ""
 		args+=('mount')
 		args+=("$BORG_REPO") # repo
 		args+=("$brg_mnt") ;; # mnt point
 
-  umount|umnt) 
+  umount|umnt)
 		prnt "umount: $brg_mnt" ""
 		args+=('umount')
 		args+=("$brg_mnt") ;; # mnt point
@@ -101,9 +113,9 @@ case ${cmd} in
 		args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
     args+=( "$src/" )
 		args+=( "${@}" 	) ;;
-
-  #"Partial Home Backup # TODO
-	part) ;;
+  
+	part) #"Partial Home Backup # TODO
+    ;;
 
 	*) prnt "no cmd" && exit ;;
 esac
