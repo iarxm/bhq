@@ -1,23 +1,24 @@
 #!/bin/env bash
-# vim:ft=sh
-# Author: Iarom Madden
-# Backups main script
-# #######################################
+
+# iarom madden mail@iarom.org
+
+# backup meta script with device specifications
+
 
 _init() {
   #bkpath="$HOME/.local/bin/fbk"
   #export PATH="$bkpath:$PATH"
-  bkhq_c="$HOME/.config/bkhq"
-  pkg_ls_dir="$HOME/.config/A.CONTROL/lsx" ;}
+  bkhq_c="${HOME}/.config/bkhq"
+  pkg_ls_dir="${HOME}/.config/A.CONTROL/lsx" ;}
 
 
-# decomp #############################################
+# decomp
 
 prnt()  { printf "BKHQ: %s\n" "##########################" "$1"; }
 prntx() { printf "BKHQ: %s\n" "$1"; }
 
 
-# prep #################################################
+# prep
 
 _notif() {
   linex+=()
@@ -43,7 +44,7 @@ _bk_sys_prepare() {
   printf "%s\n" $lsm > "$pkg_ls_dir/$date.m.txt" ;}
 
 
-# bksq ##################################################
+# bksq
 
 _dev_lcl_vcs_xaa()   { rst lca bpmin; }   # local vcs/snapshots
 _dev_lcl_vcs_xab()   { rst lca vc-xds; }
@@ -56,13 +57,20 @@ _dev_lcl_vcs_aaa() { # local version control
   prnt "init bkp '''lcas'''"
   _lcl_vcs_xaa
   _lcl_vcs_xab ;}
+
 _dev_ext_eaa() {
   prnt "init bkp '''dvas'''"
   brg dva bf ;} #rsn dva  # sudo req #rs dva.pmin # sol?
+
 _dev_ext_eba() {
   prnt "init bkp '''dvbs'''"
-  brg dvb bk-mid ;} #rsn dvb #rs dvb.pmin
-_dev_ext_ecc_aaa() { echo "";} # todo
+  brg dvb backup-mid ;} #rsn dvb #rs dvb.pmin
+
+_dev_ext_bxa() {
+  prnt "init bkp '''dvbs'''"
+  brg dvb backup-full ;} #rsn dvb #rs dvb.pmin
+
+  _dev_ext_ecc_aaa() { echo "";} # todo
 
 
 # schedules
@@ -86,7 +94,7 @@ _dev_raa() { _dev_rem_raa; }
 _dev_laa() { _dev_lcl_laa; }
 
 
-# QUES ##############################################
+# ques
 # TODO: TIDY UP / FIX
 
 _rst_que_cmd()  { rst "$repo" push "$1"; }
@@ -164,47 +172,35 @@ bkls() {
 }
 
 
-# cmd ##################################################
+# cmd
 
 _index() {
-  case $cmd in
-  tga)      _reg_aaa;; # very regular essentialls
-  tgb)      _reg_aab;;
-  laa)      _dev_lcl_vcs_aaa;; # local version control
-  dva)      _dev_eaa;;
-  dvb)      _dev_eba;;
-  raa)      _dev_rem_par_min;;
-  # maint ###################
-  pre)      _bk_sys_prepare;;
-  ky.c)     kys dvc exp ;;
-  ky.d)     kys dvd exp ;;
-  notif)    _notif ;;
-  # ########################
-  ls)       bkls $@;;
-  a)        _rst_que_y gcs ;;
-  b)        _rst_que_y gcsx ;;
-  x)        que_rst_x ;;
-  esac }
+    case $cmd in
+        tga)      _reg_aaa;; # very regular essentialls
+        tgb)      _reg_aab;;
+        laa)      _dev_lcl_vcs_aaa;; # local version control
+        dva)      _dev_eaa;;
+        dvb)      _dev_eba;;
+        raa)      _dev_rem_par_min;;
+        # maintenance
+        pre)      _bk_sys_prepare;;
+        ky.c)     kys dvc exp ;;
+        ky.d)     kys dvd exp ;;
+        notif)    _notif ;;
+        # ########################
+        ls)       bkls $@;;
+        a)        _rst_que_y gcs ;;
+        b)        _rst_que_y gcsx ;;
+        x)        que_rst_x ;;
+    esac
+}
 
 _main() {
-  _init
-  _index $@ ;}
+    _init
+    _index ${@}
+}
 
 cmd="$1" && shift 1
 
 _main $@
-
-
-#####################################
-# naming specification
-# {3-type}_{3-type_location}_{(1-type_loc}{1-loc}{method}}
-# type: device or another thing altogether
-# type_location: eg specific device
-# method: specific functions/algorithms/technologies - eg composite of different restic and borg commands to associate with a specific device like an external drive designated for a particular function
-# TODO #########################
-# ADD TO NOTES:
-# diskb: disk too full: choose between brg or rsn backup just for this one. And choose a partial set of /data
-# do keys manually as not necessary to continously back them up. Once every while is enough, and automated backups in this regard may actually overwrite the required backup in case of local corruption.
-# todo - configure way of selecting more formally
-#   - perhaps a python script with the creation of class would allow for the import of specific commands to apply to specifically defined devices
 
