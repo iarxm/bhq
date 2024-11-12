@@ -9,7 +9,8 @@ _init() {
   #bkpath="$HOME/.local/bin/fbk"
   #export PATH="$bkpath:$PATH"
   bkhq_c="${HOME}/.config/bkhq"
-  pkg_ls_dir="${HOME}/.config/A.CONTROL/lsx" ;}
+  pkg_ls_dir="${HOME}/.config/zu.ctrl/linux-arch/cur"
+}
 
 
 # decomp
@@ -33,44 +34,48 @@ _notif() {
   linex+=("X. git commits (atomised)")
   liney=" ${linex[@]}"
   notify-send -u low "REGULAR VITs:" "${liney}" ;}
-    
-_bk_sys_prepare() {
-  date=$(date +%y.%m.%d)
-  lsn=$(pacman -Qqen)
-  lsm=$(pacman -Qqem)
-  printf "%s\n" $lsn > "/etc/ll/pacmanls$date.n.txt"
-  printf "%s\n" $lsm > "/etc/ll/pacmanls$date.m.txt"
-  printf "%s\n" $lsn > "$pkg_ls_dir/$date.n.txt"
-  printf "%s\n" $lsm > "$pkg_ls_dir/$date.m.txt" ;}
+
+_bk_sys_ini() {
+  #date=$(date +%y-%m-%d)
+  date=$(date +%y-%m)
+  pkgs_pac=$(pacman -Qqen)
+  pkgs_aur=$(pacman -Qqem)
+  printf "%s\n" $pkgs_pac > "/etc/a.ctrl/arch-$date.pac.txt"
+  printf "%s\n" $pkgs_aur > "/etc/a.ctrl/arch-$date.aur.txt"
+  printf "%s\n" $pkgs_pac > "$pkg_ls_dir/$date.pac.txt"
+  printf "%s\n" $pkgs_aur > "$pkg_ls_dir/$date.aur.txt" ;}
 
 
 # bksq
 
-_dev_lcl_vcs_xaa()   { rst lca bpmin; }   # local vcs/snapshots
-_dev_lcl_vcs_xab()   { rst lca vc-xds; }
-_dev_rem_par_min()   { yes | rst gcs bpmin; } # remote - part.min
+#_dev_lcl_sys()       { _bk_sys_ini;  }
+_dev_rma_min()      { yes | rst gcs bpmin; } # remote - part.min
 
 
 # compounds
 
-_dev_lcl_vcs_aaa() { # local version control
-  prnt "init bkp '''lcas'''"
-  _lcl_vcs_xaa
-  _lcl_vcs_xab ;}
+_dev_lca_vcs_aaa() { # local version control
+  prnt "init bkp ->'''lca'''"
+  rst lca bpmin       # local vcs/snapshots
+  rst lca vc-xds      # vcs of surf media
+}
 
-_dev_ext_eaa() {
-  prnt "init bkp '''dvas'''"
-  brg dva bf ;} #rsn dva  # sudo req #rs dva.pmin # sol?
+_dev_dva_ful() {
+  prnt "init bkp ->'''dva'''"
+  brg dva bf
+} #rsn dva  # sudo req #rs dva.pmin # sol?
 
-_dev_ext_eba() {
+_dev_dvb_mid() {
+  prnt "init bkp ->'''dvb'''"
+  brg dvb backup-mid
+} #rsn dvb #rs dvb.pmin
+
+_dev_dvb_ful() {
   prnt "init bkp '''dvbs'''"
-  brg dvb backup-mid ;} #rsn dvb #rs dvb.pmin
+  brg dvb backup-full
+} #rsn dvb #rs dvb.pmin
 
-_dev_ext_bxa() {
-  prnt "init bkp '''dvbs'''"
-  brg dvb backup-full ;} #rsn dvb #rs dvb.pmin
-
-  _dev_ext_ecc_aaa() { echo "";} # todo
+_dev_ext_ecc_aaa() { echo "";} # todo
 
 
 # schedules
@@ -87,11 +92,11 @@ _reg_aab() { # regular essentials
 
 # selectors
 
-_dev_eaa() { _dev_ext_eaa; }
-_dev_eba() { _dev_ext_eba; }
-_dev_eca() { _dev_ext_eca; }
-_dev_raa() { _dev_rem_raa; }
-_dev_laa() { _dev_lcl_laa; }
+_dev_dva() { _dev_ext_eaa; }
+_dev_dvb() { _dev_ext_eba; }
+_dev_dvc() { _dev_ext_eca; }
+_dev_rma() { _dev_rem_raa; }
+_dev_lca() { _dev_lcl_laa; }
 
 
 # ques
@@ -176,14 +181,14 @@ bkls() {
 
 _index() {
     case $cmd in
-        tga)      _reg_aaa;; # very regular essentialls
+        tga)      _reg_aaa;; # most regular essentialls
         tgb)      _reg_aab;;
         laa)      _dev_lcl_vcs_aaa;; # local version control
         dva)      _dev_eaa;;
         dvb)      _dev_eba;;
         raa)      _dev_rem_par_min;;
         # maintenance
-        pre)      _bk_sys_prepare;;
+        pre)      _bk_sys_ini ;;
         ky.c)     kys dvc exp ;;
         ky.d)     kys dvd exp ;;
         notif)    _notif ;;
