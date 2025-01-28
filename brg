@@ -21,23 +21,20 @@ bkhq_c="${HOME}/.config/bkhq"
 exl_a="$bkhq_c/exla"
 exl_b="$bkhq_c/exlb"
 icl="$bkhq_c/inc"
-icl_part_mid="$bkhq_c/inc.part"
-icl_part_min="$bkhq_c/inc.part.min"
-icl_part_mst="$bkhq_c/inc.part.mst"
+icl_part_mid="$bkhq_c/inc-bxx"
+icl_part_min="$bkhq_c/inc-min"
+icl_part_mst="$bkhq_c/inc-mst"
 
-brg_mnt="$HOME/.local/share/aaa/mnt/xbk.brg/"
+brg_mnt="$HOME/.local/share/aaa/mnt/xbk-brg/"
 
 hostname="$HOST"
 
-env_dva="$bkhq_c/env.dva"
-env_dvb="$bkhq_c/env.dvb"
-env_dvx="$bkhq_c/env.dvx"
-env_lca="$bkhq_c/env.lca"
+env_dva="$bkhq_c/env-dva"
+env_dvb="$bkhq_c/env-dvb"
+env_dvx="$bkhq_c/env-dvx"
+env_lca="$bkhq_c/env-lca"
 
 src="/dat"
-
-
-# print
 
 blue=$(tput setaf 4)
 normal=$(tput sgr0)
@@ -49,14 +46,24 @@ prnt_h1()     { printf "BRG: %s \n" "################################" "$1"; }
 
 prnt()        { printf "BRG: %s \n" "$1"; }
 
-prnt_args()   { prnt_ln; prnt "$1"; shift 1; printf "BRG:   %s \n" "$@"; prnt_ln; }
+prnt_args()   { 
+    prnt_ln
+    prnt "$1"
+    shift 1
+    printf "BRG:   %s \n" "$@"
+    prnt_ln
+}
 
+env_set() {
+    . $1
+    prnt_ln
+    prnt "$2: $BORG_REPO {$BORG_PASSCOMMAND}"
+}
 
-# rep
-
-env_set()     { . $1 && prnt_h1 "$2: $BORG_REPO {$BORG_PASSCOMMAND}"; }
-
-env_set_rem() { nm_mobile && exit 1; env_set "$1" "$2"; } # todo
+env_set_rem() {
+    nm_mobile && exit 1
+    env_set "$1" "$2"
+} # todo
 
 case "${rep}" in
     dva) env_set $env_dva "device_a" ;;
@@ -70,8 +77,6 @@ case "${rep}" in
     *) prnt "repo required" && exit
 esac
 
-
-# cmd
 
 case ${cmd} in
     xx|custom)
@@ -96,7 +101,7 @@ case ${cmd} in
         args+=("$brg_mnt") ;; # mnt point
 
     bf|backup-full|full)
-        prnt "src: full '$src/'" "exl: ${exl}:" ""
+        prnt "src: full '$src/'" "exl: ${exl_a}:" ""
         args+=( 'create' )
         args+=( '--stats' )
         args+=( '--progress' )
@@ -122,10 +127,8 @@ case ${cmd} in
     *) prnt "no cmd" && exit ;;
 esac
 
-
-# run
+prnt_ln
 
 prnt_args "borg" "${args[@]}${yellow}"
 
 borg "${args[@]}"
-
