@@ -2,77 +2,82 @@
 
 # iarom madden mail@iarom.org
 
-rep=${1}
-cmd=${2}
-shift 2
+ini_v()
+{
+    rep=${1}
+    cmd=${2}
+    shift 2   
+    
+    [ -f ${BHQC} ] \
+        || { echo "missing bhq config; exiting"; exit; }
 
-gpg_dir="$HOME/.local/share/gnupg"
-bkhq_c="$HOME/.config/bkhq"
+    source ${BHQC}
+    _env_bhq
+}
 
-prnt_h1() { printf "KY: %s\n" " " "########################" "$1"; }
+prnt_h1() { printf "KY: %s\n" " " "##" "${1}"; }
 
-prnt_h2() { printf "KY: %s\n" "----------------------" "$1"; }
+prnt_h2() { printf "KY: %s\n" "--" "${1}"; }
 
-prnt()    { printf "KY: %s\n" "$1"; }
+prnt()    { printf "KY: %s\n" "${1}"; }
 
 prnt_ln() { printf "\n"; }
-
-env_dva="$bkhq_c/env.dva"
-env_dvb="$bkhq_c/env.dvb"
-env_dvc="$bkhq_c/env.dvc"
-env_dua="$bkhq_c/env.dua"
-env_dub="$bkhq_c/env.dub"
-env_duc="$bkhq_c/env.duc"
 
 mkgpg()
 {
     prnt "no gpg dir, creating it..."
     gpgconf --kill gpg-agent
-    mkdir "$gpg_dir"
-    ln -s $gpg_dir $HOME/.gnupg
-    chmod 700 "$gpg_dir"
+    mkdir "${GNUPGHOME}"
+    ln -s "${GNUPGHOME}" $HOME/.gnupg
+    chmod 700 "${GNUPGHOME}"
 }
 
-[ "$rep" ] || { prnt "no repo provided"; exit; }
+ini()
+{
+    [ "${rep}" ] || { prnt "no repo provided"; exit; }
 
-[ "$cmd" ] || { prnt "no cmd provided"; exit; }
+    [ "${cmd}" ] || { prnt "no cmd provided"; exit; }
 
-prnt_h1 "init ky sciprt..."
+    prnt_h1 "init kys script..."
 
-[ -d "$gpg_dir" ] || mkgpg
+    [ -d "${GNUPGHOME}" ] || mkgpg
+}
 
-env_set()     { . $1 && prnt_h1 "$2: $KY_REPO"; }
+env_set()     { . $1 && prnt_h1 "${BHQ_DEV}: ${KY_REPO}"; }
 
-case ${rep} in
-    dva) env_set $env_dva "dva" ;;
-    dvb) env_set $env_dvb "dvb" ;;
-    dvc) env_set $env_dvc "dvc" ;;
+set_rep()
+{
+    case ${rep} in
+    dva) env_set env_dva ;;
+    dvb) env_set env_dvb ;;
+    dvc) env_set env_dvc ;;
     #dvd) KY_REPO="$mnt_x/dvd/.key" ;;
-    dua) env_set $env_dua "dua" ;;
-    dub) env_set $env_dub "dub" ;;
-    duc) env_set $env_duc "duc" ;;
+    #dua) env_set env_dua ;;
+    #dub) env_set env_dub ;;
+    #duc) env_set env_duc ;;
     #rma) KY_REPO="$HOME/.config/key" ;; # remoe a : todo: systemitise using shamir's algorithm
-esac
+    esac
+}
 
 # bk exp
 
-gpg_bk_init()  { mkdir -p $KY_REPO; chmod 700 "$KY_REPO"; }
+gpg_bk_init()  { mkdir -p ${KY_REPO}; chmod 700 "${KY_REPO}"; }
 
 gpg_bk_pub()
 {
     gpg --export --armor --export-options backup \
-        --output "$KY_REPO/pubkeys.asc"
+        --output "${KY_REPO}/pubkeys.asc"
 }
 
 gpg_bk_prv()
 {
     gpg --export-secret-keys --armor --export-options backup \
-        --output "$KY_REPO/privatekeys.asc"
+        --output "${KY_REPO}/privatekeys.asc"
 }
 
-gpg_bk_trust() { gpg --export-ownertrust > "$KY_REPO/ownertrust.txt"; }
+gpg_bk_trust() { gpg --export-ownertrust > "${KY_REPO}/ownertrust.txt"; }
 
-gpg_ls_bk()    { ls -al "$KY_REPO/"; }
+gpg_ls_bk()    { ls -al "${KY_REPO}/"; }
 
 gpg_bk()
 {
@@ -88,13 +93,13 @@ gpg_bk()
 gpg_imp_pub()
 {
     prnt_h2 "importing Public Keys"
-    gpg --import --import-options restore "$KY_REPO/pubkeys.asc"
+    gpg --import --import-options restore "${KY_REPO}/pubkeys.asc"
 }
 
 gpg_imp_priv()
 {
     prnt_h2 "importing Private Keys"
-    gpg --import --import-options restore "$KY_REPO/privatekeys.asc"
+    gpg --import --import-options restore "${KY_REPO}/privatekeys.asc"
 }
 
 gpg_imp_test()
@@ -109,7 +114,7 @@ gpg_imp_test()
 gpg_imp_trust()
 {
     prnt_h2 "importing ownertrust"
-    gpg --import-ownertrust --import-options restore $KY_REPO/ownertrust.txt
+    gpg --import-ownertrust --import-options restore ${KY_REPO}/ownertrust.txt
 }
     
 gpg_imp_finish()
@@ -130,9 +135,18 @@ gpg_imp()
     gpg_imp_finish
 }
 
-case ${cmd} in
+main()
+{
+    ini_v ${@}
+    ini
+    set_rep
+    
+    case ${cmd} in
     exp|bk|bkp)    gpg_bk ;;
     imp)           gpg_imp ;;
-esac
+    esac
 
-prnt_ln
+    prnt_ln
+}
+
+main "${@}"

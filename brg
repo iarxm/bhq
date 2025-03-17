@@ -3,140 +3,141 @@
 # Iarom Madden mail@iarom.org
 
 # borg wrapper
+# - [x] move some of below to config files
+#declare -g hostname="${HOST}"
 
 set -e -o pipefail
-rep="$1"
-cmd="$2"
-shift 2
 
-args=()
-opt=()
+ini()
+{
+    declare -g args=()
+    declare -g opt=()
 
-bkhq_d="${HOME}/.config/bkhq"
+    [ -f ${BHQC} ] \
+        || { echo "missing bhq config; exiting"; exit; }
 
-#todo: move some of below to config files
-
-exl_a="${bkhq_d}/exla"
-exl_b="${bkhq_d}/exlb"
-icl="${bkhq_d}/inc"
-icl_part_mid="${bkhq_d}/inc-bxx"
-icl_part_min="${bkhq_d}/inc-min"
-icl_part_mst="${bkhq_d}/inc-mst"
-
-brg_mnt="${HOME}/.local/share/aaa/mnt/xbk-brg/"
-
-hostname="${HOST}"
-
-env_dva="${bkhq_d}/env-dva"
-env_dvb="${bkhq_d}/env-dvb"
-env_dvx="${bkhq_d}/env-dvx"
-env_lca="${bkhq_d}/env-lca"
-
-src="/dat"
-
-blue=$(tput setaf 4)
-normal=$(tput sgr0)
-yellow=$(tput setaf 3)
+    source ${BHQC}
+    _env_bhq
+}
 
 prn_l()     { printf "\n"; }
 
-prn_h()     { printf "BRG: %s \n" "################################" "${1}"; }
+prn_h()     { printf "BRG: %s \n" " " "${1}"; }
 
-prn()        { printf "BRG: %s \n" "${1}"; }
+prn()       { printf "BRG: %s \n" "${1}"; }
 
 prn_args()
 {
-    prn_l
-    prn "${1}"
+    prn_l; prn_l
+    prn "borg"
     shift 1
-    printf "BRG:   %s \n" "${@}"
+    printf "BRG:   %s \n" ${args[@]}${YELLOW}
     prn_l
 }
 
 env_set()
 {
-    . ${1}
-    prn_l
-    prn "${2}: ${BORG_REPO} {${BORG_PASSCOMMAND}}"
+    ${1}
+    prn_l; prn "${BHQ_DEV}: ${BORG_REPO} {${BORG_PASSCOMMAND}}"
 }
 
 env_set_rem()
 {
     # todo
-    nm_mobile && exit 1
-    env_set "${1}" "${2}"
+    nm_mobile && exit 1 #todo: exit function printing message
+    env_set "${1}"
 }
 
-case "${rep}" in
-    dva) env_set ${env_dva} "device_a" ;;
-    dvb) env_set ${env_dvb} "device_b" ;;
-    dvx) env_set ${env_dvx} "device_x" ;;
-    lca) prn "lca: TODO" && exit
-            env_set ${env_lca} "local_a" ;;
-    was.a) prn "was.a is TODO \n" && exit
-            env_set_rem ${rem_was} "wasabi_a" ;;
-    *) prn "repo required" && exit
-esac
+brg_cmd() { exec borg "${args[@]}"; }
 
-case ${cmd} in
+set_rep()
+{
+    case "${rep}" in
+        dva)  env_set "_env_dva"  ;;
+        dvb)  env_set "_env_dvb"  ;;
+        dvx)  env_set "_env_dvx"  ;;
+        lca)  env_set "_env_lca"  ;;
+        wasa) env_set "_env_r_wia" ;;
+        wasb) env_set "_rem_r_wib" ;;
+        *)    prn "repo required" && exit
+    esac
+}
+
+set_cmd()
+{
+    case ${cmd} in
     xx|custom)
-        prn "choose a custom command.." ""
+        prn "custom command: ${@}" ""
         args+=( "${@}" )
         ;;
 
     in|init)
         prn "init" ""
-        args+=( 'init')
-        args+=( '--encryption' 'repokey-blake2')
+        args+=( 'init' )
+        args+=( '--encryption' 'repokey-blake2' )
         args+=( "${@}" )
         ;;
 
     mn|mount|mnt|m)
-        prn "mount: ${brg_mnt}" ""
-        args+=('mount')
-        args+=("${BORG_REPO}")
-        args+=("${brg_mnt}")
+        prn "mount: ${BORG_MOUNTPOINT}" ""
+        args+=( 'mount' )
+        args+=( "${BORG_REPO}" )
+        args+=( "${BORG_MOUNTPOINT}" )
         ;;
 
     un|umount|umnt)
-        prn "umount: ${brg_mnt}" ""
-        args+=('umount')
-        args+=("${brg_mnt}")
+        prn "umount: ${BORG_MOUNTPOINT}" ""
+        args+=( 'umount' )
+        args+=( "${BORG_MOUNTPOINT}" )
         ;;
 
     bf|backup-full|full)
-        prn "src: full '$src/'" \
-            "exl: ${exl_a}:" \
+        prn "src: full '${SRC}/'" \
+            "exl: ${BHQ_EXL_AAX}:" \
             ""
         args+=( 'create' )
         args+=( '--stats' )
         args+=( '--progress' )
-        args+=( "--exclude-from" "$exl_a")
+        args+=( "--exclude-from" "${BHQ_EXL_AAX}" )
         args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
-        args+=( "$src/" )
+        args+=( "${SRC}/" )
         args+=( "${@}"     )
         ;;
 
     bm|backup-mid|bk-mid)
-        prn "src: partial.mid '$src/'" "exl: ${exl_a} & ${exl_b}:"
+        prn "src: partial.mid '${SRC}/'" \
+            "exl: ${BHQ_EXL_AAX}"
+            "exl: ${BHQ_EXL_ABX}"
         args+=( 'create' )
         args+=( '--stats' )
         args+=( '--progress' )
-        args+=( "--exclude-from"    "$exl_b")
-        args+=( "--exclude-from"    "$exl_a")
+        args+=( "--exclude-from" "${BHQ_EXL_AAX}" )
+        args+=( "--exclude-from" "${BHQ_EXL_ABX}" )
         args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
-        args+=( "$src/" )
-        args+=( "${@}"     )
+        args+=( "${SRC}/" )
+        args+=( "${@}" )
         ;;
   
-    part) #"Partial Home Backup # TODO
+    part)
+        #"Partial Home Backup # TODO
         ;;
 
-    *) prn "no cmd" && exit ;;
-esac
+    *) prn "no cmd" && exit
+        ;;
 
-prn_l
+    esac
+}
 
-prn_args "borg" "${args[@]}${yellow}"
+main()
+{
+    rep="${1}"; cmd="${2}"; shift 2
+    ini
 
-borg "${args[@]}"
+    set_rep
+    set_cmd "${@}"
+
+    prn_args
+    brg_cmd
+}
+
+main "${@}"

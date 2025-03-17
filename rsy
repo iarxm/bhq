@@ -17,10 +17,11 @@ exl_sy="$XDG_BIN_HOME/fbk/xfr.exly.sy"
 rst_mnt="$HOME/zs/xbk.rst/"
 hostname="$HOST"
 
+echo "TODO"; exit
 
 case ${rep} in
-    dva)     dst="/home/iao/zm/dva/.rsy" ;;
-    dvb)     dst="/home/iao/zm/dva/.rsy" ;;
+    dva)     #todo;;
+    dvb)     #todo ;;
     *)        printf "Enter Repo\n" && exit
 esac
 

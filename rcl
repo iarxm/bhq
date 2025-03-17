@@ -6,6 +6,8 @@
 # - [ ] for more clarity, the operations will be defined by the destination or in some cases the source?
 
 # todo: decompose repeating code: vars can be declared by a function call with declare -g
+# --exclude-from "$exl" \
+# rc --exclude-from "$exl" \
 
 mnt_p="$HOME/.local/share/aaa/mnt"
 
@@ -16,14 +18,12 @@ rc_sy()  { rclone sync "$src" "$dst" -vP $opt; }
 rc_cp()  { rclone copy "$src" "$dst" -vP $opt; }
 
 rc_mv()  { rclone move "$src" "$dst" -vP --track-renames $opt; }
-    # --exclude-from "$exl" \
+
 
 rc_cpx()
 {
-    src="$1"; dst="$2"; shift 2
-    opt="$@"
+    src="$1"; dst="$2"; shift 2; opt="$@"
     rc_cp
-    #--exclude-from "$exl" \
 }
 
 rc_mvx()

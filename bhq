@@ -8,10 +8,14 @@ _init()
 {
     #bkpath="$HOME/.local/bin/fbk"
     #export PATH="$bkpath:$PATH"
-    bkhq_d="${HOME}/.config/bkhq/"
-    bkhq_c="${HOME}/.config/bkhq.cfg"
-    declare -rg pkg_ls_dir
-    source "${bkhq_c}"
+    bkhq_d="${BHQ_DIR}"
+    bkhq_c="${BHQC}"
+    
+    [ -f ${BHQC} ] \
+        || { echo "missing bhq config; exiting"; exit; }
+
+    source ${BHQC}
+    _env_bhq
 }
 
 prnt()  { printf "BKHQ: %s\n" "#" "$1"; }
@@ -20,17 +24,20 @@ prntx() { printf "BKHQ: %s\n" "$1"; }
 _notif()
 {
     linex+=()
-    linex+=("A. dsvv sync <dssy>?\n")
-    linex+=("B. rclone 2 gdrive <min>?\n")
-    linex+=("D. dva dvb snaps\n")
+    linex+=("A. ds sync <dssy>?\n")
+    linex+=("B. rc 2 cloud <min>?\n")
+    linex+=("C. btrfs local snaps <min>?\n")
+    linex+=("X. btrfs snap 2 cloud <min>?\n")
     linex+=("\nASYNCHRONOUS VITs:\n")
-    linex+=("0. bkhq que..\n")
+    linex+=("0. dva dvb snaps\n")
+    linex+=("0. bhq que..\n")
     linex+=("1. keys \n")
     linex+=("2. logs \n")
     linex+=("\nHABITS \n")
     linex+=("X. git commits (atomised)")
-    liney=" ${linex[@]}"
-    notify-send -u low "REGULAR VITs:" "${liney}"
+    linex=" ${linex[@]}"
+    lineh+=("REGULAR VITs:")
+    notify-send -u low "${lineh}" "${linex}"
 }
 
 _bk_sys_ini()
@@ -85,7 +92,8 @@ _dev_ext_ecc_aaa() { echo "";} # todo
 # schedules
 
 _reg_aaa() {
-  _dev_lcl_vcs_xaa; }
+  _dev_lcl_vcs_xaa
+}
 
 _reg_aab()
 {
@@ -95,7 +103,6 @@ _reg_aab()
     _rem_par_min
     _notif
 }
-
 
 # selectors
 
@@ -197,8 +204,10 @@ bkls()
     done
 }
 
-index()
+main()
 {
+    cmd="${1}" && shift 1
+    init
     case ${cmd} in
         tga)      _reg_aaa;; # most regular essentialls
         tgb)      _reg_aab;;
@@ -217,13 +226,6 @@ index()
         b)        _rst_que_y gcsx ;;
         x)        que_rst_x ;;
     esac
-}
-
-main() {
-
-    cmd="${1}" && shift 1
-    init
-    index "${@}"
 }
 
 main "${@}"

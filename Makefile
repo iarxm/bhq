@@ -9,4 +9,3 @@ install:
 	install -m 755 bhq $(BINDIR)
 	install -m 755 brg kys rsn rst $(BINDIR)
 	install -m 755 rcl rsy tarx $(BINDIR)
-

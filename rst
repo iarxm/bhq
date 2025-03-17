@@ -2,8 +2,10 @@
 
 # Author/Modifier: Iarom Madden
 
-# restic backups
+# - [ ] replace vars with equivalent globals as in brg
 
+# restic backups
+#hostname="$HOST"
 #set -e -o pipefail
 rep="$1"
 cmd="$2"
@@ -21,7 +23,6 @@ incl_part_min="$bkhq_c/inc.part.min"
 incl_part_mst="$bkhq_c/inc.part.mst"
 
 rst_mnt="$HOME/.local/share/aaa/mnt/xbk.rst/"
-hostname="$HOST"
 
 rst_env="$HOME/.config/restic"
 env_lca="$rst_env/env.lca"
@@ -30,30 +31,28 @@ env_dvb="$rst_env/env.dvb"
 env_gcs="$rst_env/env.gcs"
 env_was="$rst_env/env.was"
 
-# COLORS
+# colors
 blue=$(tput setaf 4)
 normal=$(tput sgr0)
 yellow=$(tput setaf 3)
 
 prnt_ln()     { printf "\n"; }
 
-prnt_h1()     { printf "RST: %s \n" "################################" "$@"; prnt_ln; }
+prnt_h1()     { printf "RST: %s \n" " " "$@"; prnt_ln; }
 
-prnt_x()         { printf "RST: %s \n" "$@"; }
+prnt_x()      { printf "RST: %s \n" "$@"; }
 
-prnt()             { prnt_ln; prnt_x "$@"; }
+prnt()        { prnt_ln; prnt_x "$@"; }
 
-prnt_rep()     { prnt "repo env: $1: $RESTIC_REPOSITORY"; }
+prnt_rep()    { prnt "repo env: $1: $RESTIC_REPOSITORY"; }
 
 prnt_ls()     { while IFS= read -r i; do prnt_x "$i"; done; }
 
-prnt_args() { prnt_ln; prnt_x "$1"; shift 1; printf "RST:   %s \n" "$@"; prnt_ln; }
+prnt_args()   { prnt_ln; prnt_x "$1"; shift 1; printf "RST:   %s \n" "$@"; prnt_ln; }
 
-prnt_fin()     { printf "${normal}\n"; prnt "END OF SCRIPT"; prnt_ln; }
+prnt_fin()    { printf "${normal}\n"; prnt "END OF SCRIPT"; prnt_ln; }
 
-# define ################################################
-
-hspot_test() { nm_mobile || { printf "Exiting script\n"; exit 1; }; }
+hspot_test()  { nm_mobile || { printf "Exiting script\n"; exit 1; }; }
 
 rep_set()     { . "$1" && prnt_rep "$2" ; }
 
@@ -69,119 +68,121 @@ case $rep in
     was) printf "TODO \n" && exit ; rep_rem "$env_was" "remote_wasabi" ;;
     gcs) 
         rep_rem $env_gcs "remote_gcs"
-        args+=( "--option" "gs.connections=$GS_CONNECTIONS" ) ;; #todo - migrate personal args to config file also
+        args+=( "--option" "gs.connections=$GS_CONNECTIONS" )
+        ;; #todo - migrate personal args to config file also
     
     gcsx)
         # GS CONNECTIONS MINIMUM SETTING
         rep_rem $env_gcs "remote_gcsx"
-    args+=( "--option" "gs.connections=1" )
-    args+=( "--verbose=3" ) ;;
+        args+=( "--option" "gs.connections=1" )
+        args+=( "--verbose=3" ) ;;
 
-  *) prnt "arg1: repo" "opts: gcs ; dvX ; lcX" && exit
-      ;;
-
+    *) prnt "arg1: repo" "opts: gcs ; dvX ; lcX" && exit
+        ;;
 esac
 
 case ${cmd} in
   
-  # custom
     custom|xx)
         prnt "choose a custom command"
-        args+=("${@}") ;;
+        args+=("${@}")
+        ;;
 
-  # mount
     mount|mnt)
         prnt "mounting repo on $rst_mnt"
-        args+=('mount'     "$rst_mnt") ;;
+        args+=('mount'     "$rst_mnt")
+        ;;
 
-  # push??
     push)
         prnt "partial of /data/" "dirs:" "%40s" "${blue}$(ls ${@})${normal}"
-    args+=(    'backup' )
-    args+=( '--tag'                     'push-mod' )
-    args+=( "--exclude-file"     "$exl")
-    args+=( "${@}" ) ;;
+        args+=(    'backup' )
+        args+=( '--tag'                     'push-mod' )
+        args+=( "--exclude-file"     "$exl")
+        args+=( "${@}" )
+        ;;
 
-  # mid
     backup-part-mid|bpmid|push-part-mid|psh-mid)
         prnt "partial of /data/" "dirs:" "" "$(cat ${incl_part_mid})"
-    args+=( 'backup' )
-    args+=( '--tag' 'data-part' )
-        args+=( "--exclude-file"     "$exl")
-    args+=( "--files-from"     "$incl_part_mid" ) ;;
+        args+=( 'backup' )
+        args+=( '--tag' 'data-part' )
+        args+=( "--exclude-file" "$exl" )
+        args+=( "--files-from" "$incl_part_mid" )
+        ;;
 
-  # min
-  push-part-min|backup-part-min|bpmin|p)
+    push-part-min|backup-part-min|bpmin|p)
         prnt "partial of /data/" "dirs:"
         prnt_ls < "${incl_part_min}"
-    args+=( 'backup' )
-    args+=( "--tag" "data-part-min" )
-    args+=( "--exclude-file" "$exl")
-    args+=( "--files-from" "$incl_part_min" ) ;;
+        args+=( 'backup' )
+        args+=( "--tag" "data-part-min" )
+        args+=( "--exclude-file" "$exl")
+        args+=( "--files-from" "$incl_part_min" )
+        ;;
 
-  # most
-  push-part-most|backup-part-most|bpmst)
+    push-part-most|backup-part-most|bpmst)
         prnt "key user data" "dirs" 
         prnt_ls "$(cat ${incl_part})"
-    args+=( 'backup' )
-    args+=( '--tag' 'data-most' )
-    args+=( '--exclude-file' "$exl" )
-    args+=( "--files-from" "$incl_part_mst" ) ;;
+        args+=( 'backup' )
+        args+=( '--tag' 'data-most' )
+        args+=( '--exclude-file' "$exl" )
+        args+=( "--files-from" "$incl_part_mst" )
+        ;;
 
-  # full
-  push-full|backup-full|bf)
+    push-full|backup-full|bf)
         prnt "full bk /data/" "exclude using:" "$(cat ${exl})"
-    args+=( 'backup' )
-    args+=( '--tag data-full' )
-    args+=( "--exclude-file" "$exl")
-    args+=( "/data/" ) ;;
+        args+=( 'backup' )
+        args+=( '--tag data-full' )
+        args+=( "--exclude-file" "$exl")
+        args+=( "/data/" )
+        ;;
 
-  # forget
-  forget|f)
-    prnt "forget old snapshots"
-    args+=(
-      "forget"
-      "--host" "$hostname"
-      "--group-by" "paths"
-      "--keep-last" "$KEEP_LAST"
-      "--keep-hourly" "$RETENTION_HOURS"
-      "--keep-daily" "$RETENTION_DAYS"
-      "--keep-weekly" "$RETENTION_WEEKS"
-      "--keep-monthly" "$RETENTION_MONTHS"
-      "--keep-yearly" "$RETENTION_YEARS" ) ;;
+    forget|f)
+        prnt "forget old snapshots"
+        args+=(
+            "forget"
+            "--group-by"     "paths"
+            "--host"         "${HOST}"
+            "--keep-last"    "${KEEP_LAST}"
+            "--keep-hourly"  "${RETENTION_HOURS}"
+            "--keep-daily"   "${RETENTION_DAYS}"
+            "--keep-weekly"  "${RETENTION_WEEKS}"
+            "--keep-monthly" "${RETENTION_MONTHS}"
+            "--keep-yearly"  "${RETENTION_YEARS}"
+        )
+        ;;
 
-  # forget prune
-  forget-prune|fp)
-    prnt "forgetting and pruning old snapshots"
-    args+=(
-      "forget"
-      "--prune"
-      "--host" "$hostname"
-      "--group-by" "paths"
-      "--keep-last" "$KEEP_LAST"
-      "--keep-hourly" "$RETENTION_HOURS"
-      "--keep-daily" "$RETENTION_DAYS"
-      "--keep-weekly" "$RETENTION_WEEKS"
-      "--keep-monthly" "$RETENTION_MONTHS"
-      "--keep-yearly" "$RETENTION_YEARS" ) ;;
+    forget-prune|fp)
+        prnt "forgetting and pruning old snapshots"
+        args+=(
+            "forget"
+            "--prune"
+            "--group-by"     "paths"
+            "--host"         "${HOST}"
+            "--keep-last"    "${KEEP_LAST}"
+            "--keep-hourly"  "${RETENTION_HOURS}"
+            "--keep-daily"   "${RETENTION_DAYS}"
+            "--keep-weekly"  "${RETENTION_WEEKS}"
+            "--keep-monthly" "${RETENTION_MONTHS}"
+            "--keep-yearly"  "${RETENTION_YEARS}"
+        )
+        ;;
 
-  # vcs xda
     version-control-xds|vc-xds|vcs-xds|xds)
         prnt "vcs equivalent for ~/xdsa/"
         args+=( 'backup' )
         args+=( '--tag' 'xds' )
-      args+=( '/data/ux/dsa/' '/data/ux/dsb/' ) ;;
+        args+=( '/data/ux/dsa/' '/data/ux/dsb/' )
+        ;;
 
-
-  *) # help
-    prnt \
+    *)
+        prnt \
             "arg2: restic cmd. options:" \
-        "- bp     | backup-partial of /data/" \
-        "- bfh     | backup-full-home" \
-        "- bh     | backup-home:" \
-        "- f         | forget: Forgets snapshots according to retention policies" \
+            "- bp     | backup-partial of /data/" \
+            "- bfh    | backup-full-home" \
+            "- bh     | backup-home:" \
+            "- f      | forget: Forgets snapshots according to retention policies" \
             "- fp     | forget-prune: forget but also prunes unused data from the repo"
-        exit ;;
+        exit
+        ;;
 
 esac
 
