@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
 
-##########################################
-#
 # Author/Modifier: Iarom Madden
-#
-# RESTIC BACKUPS
-#
-##########################################
 
-# init
+# restic backups
 
 #set -e -o pipefail
 rep="$1"
@@ -26,7 +20,7 @@ incl_part_mid="$bkhq_c/inc.part"
 incl_part_min="$bkhq_c/inc.part.min"
 incl_part_mst="$bkhq_c/inc.part.mst"
 
-rst_mnt="$HOME/.local/share/amnt/xbk.rst/"
+rst_mnt="$HOME/.local/share/aaa/mnt/xbk.rst/"
 hostname="$HOST"
 
 rst_env="$HOME/.config/restic"
@@ -36,94 +30,90 @@ env_dvb="$rst_env/env.dvb"
 env_gcs="$rst_env/env.gcs"
 env_was="$rst_env/env.was"
 
-
-# print #################################################
-
 # COLORS
 blue=$(tput setaf 4)
 normal=$(tput sgr0)
 yellow=$(tput setaf 3)
 
-prnt_ln() 	{ printf "\n"; }
+prnt_ln()     { printf "\n"; }
 
-prnt_h1() 	{ printf "RST: %s \n" "################################" "$@"; prnt_ln; }
+prnt_h1()     { printf "RST: %s \n" "################################" "$@"; prnt_ln; }
 
-prnt_x() 		{ printf "RST: %s \n" "$@"; }
+prnt_x()         { printf "RST: %s \n" "$@"; }
 
-prnt() 			{ prnt_ln; prnt_x "$@"; }
+prnt()             { prnt_ln; prnt_x "$@"; }
 
-prnt_rep() 	{ prnt "repo env: $1: $RESTIC_REPOSITORY"; }
+prnt_rep()     { prnt "repo env: $1: $RESTIC_REPOSITORY"; }
 
-prnt_ls() 	{ while IFS= read -r i; do prnt_x "$i"; done; }
+prnt_ls()     { while IFS= read -r i; do prnt_x "$i"; done; }
 
 prnt_args() { prnt_ln; prnt_x "$1"; shift 1; printf "RST:   %s \n" "$@"; prnt_ln; }
 
-prnt_fin() 	{ printf "${normal}\n"; prnt "END OF SCRIPT"; prnt_ln; }
+prnt_fin()     { printf "${normal}\n"; prnt "END OF SCRIPT"; prnt_ln; }
 
 # define ################################################
 
 hspot_test() { nm_mobile || { printf "Exiting script\n"; exit 1; }; }
 
-rep_set() 	{ . "$1" && prnt_rep "$2" ; }
+rep_set()     { . "$1" && prnt_rep "$2" ; }
 
-rep_rem() 	{ hspot_test && rep_set "$1" "$2"; }
+rep_rem()     { hspot_test && rep_set "$1" "$2"; }
 
-# repo ####################################################
 
 prnt_h1 "restic script: init"
 
 case $rep in
-	lca) rep_set "$env_lca" "local_vcs_a" ;;
-  dva) printf "TODO \n" && exit ; rep_set "$env_dva" "device_a" ;;
-	dvb) printf "TODO \n" && exit ; rep_set "$env_dvb" "device_b" ;;
-	was) printf "TODO \n" && exit ; rep_rem "$env_was" "remote_wasabi" ;;
-
-	gcs) 
-		rep_rem $env_gcs "remote_gcs"
-    args+=( "--option" "gs.connections=$GS_CONNECTIONS" ) ;;
-	
-	gcsx) # GS CONNECTIONS MINIMUM SETTING
-		rep_rem $env_gcs "remote_gcsx"
+    lca) rep_set "$env_lca" "local_vcs_a" ;;
+    dva) printf "TODO \n" && exit ; rep_set "$env_dva" "device_a" ;;
+    dvb) printf "TODO \n" && exit ; rep_set "$env_dvb" "device_b" ;;
+    was) printf "TODO \n" && exit ; rep_rem "$env_was" "remote_wasabi" ;;
+    gcs) 
+        rep_rem $env_gcs "remote_gcs"
+        args+=( "--option" "gs.connections=$GS_CONNECTIONS" ) ;; #todo - migrate personal args to config file also
+    
+    gcsx)
+        # GS CONNECTIONS MINIMUM SETTING
+        rep_rem $env_gcs "remote_gcsx"
     args+=( "--option" "gs.connections=1" )
     args+=( "--verbose=3" ) ;;
 
-  *) prnt "arg1: repo" "opts: gcs ; dvX ; lcX" && exit ;;
+  *) prnt "arg1: repo" "opts: gcs ; dvX ; lcX" && exit
+      ;;
+
 esac
 
-# cmd ########################################################
-
-case $cmd in
+case ${cmd} in
   
   # custom
-	custom|xx)
-		prnt "choose a custom command"
-		args+=("${@}") ;;
+    custom|xx)
+        prnt "choose a custom command"
+        args+=("${@}") ;;
 
   # mount
-	mount|mnt)
-		prnt "mounting repo on $rst_mnt"
-		args+=('mount' 	"$rst_mnt") ;;
+    mount|mnt)
+        prnt "mounting repo on $rst_mnt"
+        args+=('mount'     "$rst_mnt") ;;
 
   # push??
-	push)
-		prnt "partial of /data/" "dirs:" "%40s" "${blue}$(ls ${@})${normal}"
-    args+=(	'backup' )
-    args+=( '--tag' 					'push-mod' )
-    args+=( "--exclude-file" 	"$exl")
+    push)
+        prnt "partial of /data/" "dirs:" "%40s" "${blue}$(ls ${@})${normal}"
+    args+=(    'backup' )
+    args+=( '--tag'                     'push-mod' )
+    args+=( "--exclude-file"     "$exl")
     args+=( "${@}" ) ;;
 
   # mid
-	backup-part-mid|bpmid|push-part-mid|psh-mid)
-		prnt "partial of /data/" "dirs:" "" "$(cat ${incl_part_mid})"
+    backup-part-mid|bpmid|push-part-mid|psh-mid)
+        prnt "partial of /data/" "dirs:" "" "$(cat ${incl_part_mid})"
     args+=( 'backup' )
     args+=( '--tag' 'data-part' )
-		args+=( "--exclude-file" 	"$exl")
-    args+=( "--files-from" 	"$incl_part_mid" ) ;;
+        args+=( "--exclude-file"     "$exl")
+    args+=( "--files-from"     "$incl_part_mid" ) ;;
 
   # min
   push-part-min|backup-part-min|bpmin|p)
-		prnt "partial of /data/" "dirs:"
-		prnt_ls < "${incl_part_min}"
+        prnt "partial of /data/" "dirs:"
+        prnt_ls < "${incl_part_min}"
     args+=( 'backup' )
     args+=( "--tag" "data-part-min" )
     args+=( "--exclude-file" "$exl")
@@ -131,8 +121,8 @@ case $cmd in
 
   # most
   push-part-most|backup-part-most|bpmst)
-		prnt "key user data" "dirs" 
-		prnt_ls "$(cat ${incl_part})"
+        prnt "key user data" "dirs" 
+        prnt_ls "$(cat ${incl_part})"
     args+=( 'backup' )
     args+=( '--tag' 'data-most' )
     args+=( '--exclude-file' "$exl" )
@@ -140,7 +130,7 @@ case $cmd in
 
   # full
   push-full|backup-full|bf)
-		prnt "full bk /data/" "exclude using:" "$(cat ${exl})"
+        prnt "full bk /data/" "exclude using:" "$(cat ${exl})"
     args+=( 'backup' )
     args+=( '--tag data-full' )
     args+=( "--exclude-file" "$exl")
@@ -176,26 +166,24 @@ case $cmd in
       "--keep-yearly" "$RETENTION_YEARS" ) ;;
 
   # vcs xda
-	version-control-xds|vc-xds|vcs-xds|xds)
-		prnt "vcs equivalent for ~/xdsa/"
-		args+=( 'backup' )
-		args+=( '--tag' 'xds' )
-  	args+=( '/data/ux/dsa/' '/data/ux/dsb/' ) ;;
+    version-control-xds|vc-xds|vcs-xds|xds)
+        prnt "vcs equivalent for ~/xdsa/"
+        args+=( 'backup' )
+        args+=( '--tag' 'xds' )
+      args+=( '/data/ux/dsa/' '/data/ux/dsb/' ) ;;
 
 
   *) # help
     prnt \
-			"arg2: restic cmd. options:" \
-    	"- bp 	| backup-partial of /data/" \
-    	"- bfh 	| backup-full-home" \
-    	"- bh 	| backup-home:" \
-    	"- f 		| forget: Forgets snapshots according to retention policies" \
-			"- fp 	| forget-prune: forget but also prunes unused data from the repo"
-		exit ;;
+            "arg2: restic cmd. options:" \
+        "- bp     | backup-partial of /data/" \
+        "- bfh     | backup-full-home" \
+        "- bh     | backup-home:" \
+        "- f         | forget: Forgets snapshots according to retention policies" \
+            "- fp     | forget-prune: forget but also prunes unused data from the repo"
+        exit ;;
 
 esac
-
-# run #########################################
 
 prnt_args "restic" "${args[@]}${yellow}"
 
