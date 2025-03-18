@@ -24,13 +24,12 @@ prn_l()     { printf "\n"; }
 
 prn_h()     { printf "BRG: %s \n" " " "${1}"; }
 
-prn()       { printf "BRG: %s \n" "${1}"; }
+prn()       { printf "BRG: %s \n" "${@}"; }
 
 prn_args()
 {
-    prn_l; prn_l
+    prn_l
     prn "borg"
-    shift 1
     printf "BRG:   %s \n" ${args[@]}${YELLOW}
     prn_l
 }
@@ -93,8 +92,7 @@ set_cmd()
 
     bf|backup-full|full)
         prn "src: full '${SRC}/'" \
-            "exl: ${BHQ_EXL_AAX}:" \
-            ""
+            "exl: ${BHQ_EXL_AAX}:"
         args+=( 'create' )
         args+=( '--stats' )
         args+=( '--progress' )
