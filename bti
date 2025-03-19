@@ -1,0 +1,27 @@
+#!/bin/env bash
+
+# iarom madden mail@iarom.org
+
+# backup meta script with device specifications
+
+_bk_sys_pre()
+{
+    #date=$(date +%y-%m-%d)
+    date=$(date +%y-%m)
+    pkgs_pac=$(pacman -Qqen)
+    pkgs_aur=$(pacman -Qqem)
+    printf "%s\n" $pkgs_pac > "/etc/zu-ctrl/arch-$date-pac.txt"
+    printf "%s\n" $pkgs_aur > "/etc/zu-ctrl/arch-$date-aur.txt"
+    printf "%s\n" $pkgs_pac > "$pkg_ls_dir/$date-pac.txt"
+    printf "%s\n" $pkgs_aur > "$pkg_ls_dir/$date-aur.txt"
+}
+
+main()
+{
+    case ${cmd} in
+        ls)       bkls ${@};;
+        a)        _rst_que_y gcs ;;
+        b)        _rst_que_y gcsx ;;
+        x)        que_rst_x ;;
+    esac
+}

@@ -34,6 +34,12 @@ prn_args()
     prn_l
 }
 
+tst_args()
+{
+    [ -n ${args} ] \
+        || { prn "no cmd" && exit; }
+}
+
 env_set()
 {
     ${1}
@@ -65,10 +71,7 @@ set_rep()
 set_cmd()
 {
     case ${cmd} in
-    xx|custom)
-        prn "custom command: ${@}" ""
-        args+=( "${@}" )
-        ;;
+
 
     in|init)
         prn "init" ""
@@ -120,9 +123,12 @@ set_cmd()
         #"Partial Home Backup # TODO
         ;;
 
-    *) prn "no cmd" && exit
+    *)
+        prn "custom command: ${cmd}"
+        args+=( "${@}" )
+        echo "hello"
+        tst_args
         ;;
-
     esac
 }
 
@@ -130,7 +136,7 @@ main()
 {
     rep="${1}"; cmd="${2}"; shift 2
     ini
-
+echo "hello"
     set_rep
     set_cmd "${@}"
 

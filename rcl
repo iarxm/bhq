@@ -11,7 +11,7 @@
 
 mnt_p="$HOME/.local/share/aaa/mnt"
 
-rc_mn() { rclone mount "$src" "$mnt" $opt & }
+rc_mn()  { rclone mount "$src" "$mnt" $opt & }
 
 rc_sy()  { rclone sync "$src" "$dst" -vP $opt; }
 
