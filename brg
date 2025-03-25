@@ -3,15 +3,25 @@
 # Iarom Madden mail@iarom.org
 
 # borg wrapper
-# - [x] move some of below to config files
-#declare -g hostname="${HOST}"
 
-set -e -o pipefail
+# archive
+# - [x] move relevant code to config files
+#set -e -o pipefail
+
+set -o pipefail
 
 ini()
 {
+    #declare -g hostname="${HOST}"
+    declare -g brg_opts_env_common=()
+    declare -g brg_opts_env_init=()
+    declare -g brg_opts_env_mount=()
+    declare -g brg_opts_env_umount=()
+    declare -g brg_opts_env_prune=()
+    declare -g brg_opts_env_compact=()
+    declare -g brg_opts_env_create=()
     declare -g args=()
-    declare -g opt=()
+    declare -g argx=()
 
     [ -f ${BHQC} ] \
         || { echo "missing bhq config; exiting"; exit; }
@@ -20,18 +30,44 @@ ini()
     _env_bhq
 }
 
-prn_l()     { printf "\n"; }
+args_add()
+{
+    if [ -n "${1}" ]; then
+        args+=( "${1}" )
+    else
+        return 0
+    fi
+}
 
-prn_h()     { printf "BRG: %s \n" " " "${1}"; }
+args_brg_create()
+{
+    args_add "${brg_args_env_common}"
+    args+=(
+        "create"
+        "--show-rc"
+        "--list"
+        "--stats"
+        "--progress"
+        "--exclude-from" "${BHQ_EXL_AAX}"
+    )
+    args_add "${argx}"
+    args_add "${@}"
+    args+=(
+        "::$(date +%y-%m-%d_%H-%M)"
+       "${SRC}/"
+    )
+}
 
-prn()       { printf "BRG: %s \n" "${@}"; }
+prl()     { printf "\n"; }
+
+prh()     { printf "BRG: %s \n" " " "${1}"; }
+
+prn()     { printf "BRG: %s \n" "${@}"; }
 
 prn_args()
 {
-    prn_l
-    prn "borg"
-    printf "BRG:   %s \n" ${args[@]}${YELLOW}
-    prn_l
+    printf " borg\n"
+    printf "    %s\n" "${args[@]}${YELLOW}"; prl
 }
 
 tst_args()
@@ -43,7 +79,7 @@ tst_args()
 env_set()
 {
     ${1}
-    prn_l; prn "${BHQ_DEV}: ${BORG_REPO} {${BORG_PASSCOMMAND}}"
+    prl; prn "${BHQ_DEV}: ${BORG_REPO} {${BORG_PASSCOMMAND}}"
 }
 
 env_set_rem()
@@ -52,6 +88,7 @@ env_set_rem()
     nm_mobile && exit 1 #todo: exit function printing message
     env_set "${1}"
 }
+
 
 brg_cmd() { exec borg "${args[@]}"; }
 
@@ -72,61 +109,102 @@ set_cmd()
 {
     case ${cmd} in
 
-
     in|init)
-        prn "init" ""
-        args+=( 'init' )
-        args+=( '--encryption' 'repokey-blake2' )
-        args+=( "${@}" )
+        prn "init ${BORG_REPO}"; prnl
+        args_add ${brg_args_env_common}
+        args_add "init"
+        args_add "${brg_opts_env_init}"
+        args_add "${@}"
         ;;
 
     mn|mount|mnt|m)
-        prn "mount: ${BORG_MOUNTPOINT}" ""
-        args+=( 'mount' )
-        args+=( "${BORG_REPO}" )
-        args+=( "${BORG_MOUNTPOINT}" )
+        prn "mount ${BORG_REPO} on ${BORG_MOUNTPOINT}"; prl
+        args_add "${brg_args_env_common}"
+        args_add "mount"
+        args_add "${brg_opts_env_mount}"
+        args_add "${@}"
+        args+=(
+            "::"
+            "${BORG_MOUNTPOINT}"
+        )
         ;;
 
-    un|umount|umnt)
-        prn "umount: ${BORG_MOUNTPOINT}" ""
-        args+=( 'umount' )
-        args+=( "${BORG_MOUNTPOINT}" )
+    un|umount|um|umnt)
+        prn "umount ${BORG_MOUNTPOINT}"; prl
+        args_add "${brg_args_env_common}"
+        args_add "${@}"
+        args+=(
+            "umount"
+            "${BORG_MOUNTPOINT}"
+        )
+        ;;
+
+    prune)
+        prn "prune ${BORG_REPO}"; prl
+        args_add "${brg_args_env_common}"
+        args_add "prune"
+        args_add "${brg_opts_env_prune}"
+        args_add "${@}"
+        ;;
+
+    compact)
+        prn "prune ${BORG_REPO}"; prl
+        args_add "${brg_args_env_common}"
+        args_add "${@}"
+        args_add "compact"
         ;;
 
     bf|backup-full|full)
-        prn "src: full '${SRC}/'" \
-            "exl: ${BHQ_EXL_AAX}:"
-        args+=( 'create' )
-        args+=( '--stats' )
-        args+=( '--progress' )
-        args+=( "--exclude-from" "${BHQ_EXL_AAX}" )
-        args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
-        args+=( "${SRC}/" )
-        args+=( "${@}"     )
+        prn "src: full '${SRC}/'"; prl
+        args_brg_create "${@}"
         ;;
 
     bm|backup-mid|bk-mid)
-        prn "src: partial.mid '${SRC}/'" \
-            "exl: ${BHQ_EXL_AAX}"
-            "exl: ${BHQ_EXL_ABX}"
-        args+=( 'create' )
-        args+=( '--stats' )
-        args+=( '--progress' )
-        args+=( "--exclude-from" "${BHQ_EXL_AAX}" )
-        args+=( "--exclude-from" "${BHQ_EXL_ABX}" )
-        args+=( "::'$(date +%y.%m.%d.%H.%M)'" )
-        args+=( "${SRC}/" )
-        args+=( "${@}" )
+        prn "src: partial.mid '${SRC}/'"; prl
+        argx+=( "--exclude-from" "${BHQ_EXL_ABX}" )
+        args_brg_create "${@}"
         ;;
   
-    part)
+    bh|backup-home)
         #"Partial Home Backup # TODO
+        prn "src: backup-home '${SRC}/'"
+        #argx+=("")
+        args_brg_create "${@}"
+        prn "TODO"
+        exit
+        ;;
+       
+    bf-macro)
+        # - https://borgbackup.readthedocs.io/en/stable/quickstart.html#automating-backups
+        prn "full backup macro; create, prune, compact '${SRC}'/"
+
+        trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
+
+        ${0} ${rep} bf
+        exit_backup=${?}
+        ${0} ${rep} prune
+        exit_prune=${?}
+        ${0} ${rep} compact
+        exit_compact=${?}
+
+        exit_global=$(( exit_backup > exit_prune ? exit_backup : exit_prune ))
+        exit_global=$(( exit_comapct > exit_global ? exit_compact : exit_global ))
+
+        if [ ${exit_global} -eq 0 ]; then
+            prn "Finished successfully"
+        elif [ ${exit_global} -eq 1 ]; then
+            prn "Finished with warnings"
+        else
+            prn "Finished with errors"
+        fi
+
+        exit "${exit_global}"
         ;;
 
     *)
         prn "custom command: ${cmd}"
-        args+=( "${@}" )
-        echo "hello"
+        args_add "${brg_args_env_common}"
+        args_add "${@}"
         tst_args
         ;;
     esac
@@ -134,9 +212,11 @@ set_cmd()
 
 main()
 {
-    rep="${1}"; cmd="${2}"; shift 2
+    rep="${1}"
+    cmd="${2}"
+    shift 2
+
     ini
-echo "hello"
     set_rep
     set_cmd "${@}"
 
