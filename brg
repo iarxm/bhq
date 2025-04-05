@@ -4,10 +4,7 @@
 
 # borg wrapper
 
-# archive
-# - [x] move relevant code to config files
 #set -e -o pipefail
-
 set -o pipefail
 
 ini()
