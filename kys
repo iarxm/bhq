@@ -43,14 +43,14 @@ ini()
     [ -d "${GNUPGHOME}" ] || mkgpg
 }
 
-env_set()     { . $1 && prnt_h1 "${BHQ_DEV}: ${KY_REPO}"; }
+env_set()     { ${1} && prnt_h1 "${BHQ_DEV}: ${KY_REPO}"; }
 
 set_rep()
 {
     case ${rep} in
-    dva) env_set env_dva ;;
-    dvb) env_set env_dvb ;;
-    dvc) env_set env_dvc ;;
+    dva) env_set _env_dva ;;
+    dvb) env_set _env_dvb ;;
+    dvc) env_set _env_dvc ;;
     #dvd) KY_REPO="$mnt_x/dvd/.key" ;;
     #dua) env_set env_dua ;;
     #dub) env_set env_dub ;;
