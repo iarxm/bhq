@@ -75,7 +75,7 @@ _dev_dvd_a()
     kys dvd exp
 }
 
-_dev_ext_ecc_aaa() { echo "";} # todo
+_dev_dve_a() { echo "";} # todo
 
 # schedules
 
@@ -91,14 +91,6 @@ _reg_aab()
     _notif
 }
 
-# selectors
-
-_dva() { _dev_ext_eaa; }
-_dvb() { _dev_ext_eba; }
-_dvc() { _dev_ext_eca; }
-_rma() { _dev_rem_raa; }
-_lca() { _dev_lcl_laa; }
-
 main()
 {
     cmd="${1}" && shift 1
@@ -108,12 +100,15 @@ main()
         tga)      _reg_aaa ;;
         tgb)      _reg_aab ;;
         laa)      _dev_lcl_vcs_aaa ;;
-        dva)      _dva ;;
-        dvb)      _dev_eba ;;
         raa)      _dev_rem_par_min ;;
+        # selectors
+        rma)      _dev_rem_raa ;;
+        lca)      _dev_lcl_laa ;;
+        dva)      _dev_dva_a ;;
+        dvb)      _dev_dvb_a ;;
+        dvc)      _dev_dvc_a ;;
         # maintenance
         pre)      _bk_sys_ini ;;
-
         notif)    notif ;;
         *)        $(@) ;;
     esac
