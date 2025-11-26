@@ -61,21 +61,34 @@ set_rep()
 
 # bk exp
 
-gpg_bk_init()  { mkdir -p ${KY_REPO}; chmod 700 "${KY_REPO}"; }
+gpg_bk_init()
+{
+    mkdir -p ${KY_REPO}
+    chmod 700 "${KY_REPO}"
+}
 
 gpg_bk_pub()
 {
-    gpg --export --armor --export-options backup \
+    gpg \
+        --export \
+        --armor \
+        --export-options backup \
         --output "${KY_REPO}/pubkeys.asc"
 }
 
 gpg_bk_prv()
 {
-    gpg --export-secret-keys --armor --export-options backup \
+    gpg \
+        --export-secret-keys \
+        --armor \
+        --export-options backup \
         --output "${KY_REPO}/privatekeys.asc"
 }
 
-gpg_bk_trust() { gpg --export-ownertrust > "${KY_REPO}/ownertrust.txt"; }
+gpg_bk_trust()
+{ 
+    gpg --export-ownertrust > "${KY_REPO}/ownertrust.txt"
+}
 
 gpg_ls_bk()    { ls -al "${KY_REPO}/"; }
 
@@ -140,7 +153,7 @@ main()
     ini_v ${@}
     ini
     set_rep
-    
+   
     case ${cmd} in
     exp|bk|bkp)    gpg_bk ;;
     imp)           gpg_imp ;;
