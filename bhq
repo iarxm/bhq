@@ -80,8 +80,9 @@ _dvx_a()
 
 # schedules
 
-_reg_aaa() {
-    _lcl_vcs_x
+_reg_aaa()
+{
+    _lcl_vcs_a
 }
 _reg_aab()
 {
@@ -96,12 +97,13 @@ main()
     cmd="${1}" && shift 1
     ini
     case ${cmd} in
+        # batch schedules
         tga)      _reg_aaa ;;
         tgb)      _reg_aab ;;
-        laa)      _lcl_vcs_aaa ;;
-        raa)      _rem_par_min ;;
         # local/remote selectors
+        raa)      _rem_min ;;
         rma)      _rem_raa ;;
+        laa)      _lcl_vcs_a ;;
         lca)      _lcl_laa ;;
         # dependent on device plugs
         dva)      _dva_a ;;
