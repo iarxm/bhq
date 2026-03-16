@@ -2,6 +2,16 @@
 # iarom mail@iarom.org
 # backup meta script with device specs
 
+# targets such as plugin storage devices, remote cloud target, local machine
+# methods/types such as brg, rst, keys
+# groups of methods per targets
+# schedules for remote or locally accessible
+# automations for autmounted/mounted plugin storageA
+# TASK basic fs bkp of important dirs to devices iva eg rsync
+# TASK probably better to the content here config like
+# it heavily refers to user level custom cmds
+# TASK update schedules
+
 ini()
 {
     [ -f ${BHQC} ] \
@@ -22,69 +32,62 @@ _bk_sys_ini()
 
 # bksq
 
-_dev_lcb_sys()      { _bk_sys_ini;  }
-_dev_rma_min()      { yes | rst gcs bpmin; } # remote - part.min
+_lcb_sys()      { _bk_sys_ini;  }
+_rma_rst_min()  { yes | rst gcs bpmin; } # remote part min
 
 # compounds
 
-# - [ ] basic fs backup of important dirs to devices as an rsync sync
-#     - to host a copy
-
-_dev_lca_vcs_aaa()
+_lca_vcs_a()
 { 
+    # local rst now outdated
+    # TASK setup btrfs snapshots
     prnt "init bkp ->'''lca'''"
-    rst lca bpmin       # local vcs/snapshots
-    rst lca vc-xds      # vcs of surf media
+    #rst lca bpmin       # local vcs/snapshots
+    #rst lca vc-xds      # vcs of surf media
 }
-
-_dev_dva_a()
+_dva_a()
 {
     prnt "init bkp ->'''dva'''"
     brg dva bf
     kys dva exp
     #rsn dva  # sudo req #rs dva.pmin # sol?
 } 
-
-_dev_dvb_a()
+_dvb_a()
 {
     prnt "init bkp '''dvbs'''"
-    brg dvb bf
+    brg dvb full
     kys dvb exp
     #rsn dvb #rs dvb.pmin
 }
-
-_dev_dvb_b()
+_dvb_b()
 {
     prnt "init bkp ->'''dvb'''"
     brg dvb backup-mid
+    kys dvb exp
     #rsn dvb #rs dvb.pmin
 }
-
-_dev_dvc_a()
+_dvc_a()
 {
     prnt "init bkp ->'''dvc'''"
     kys dvc exp
 }
-
-_dev_dvd_a()
+_dve_a() { echo "";} # todo
+_dvx_a()
 {
-    prnt "init bkp ->'''dvd'''"
-    kys dvd exp
+    prnt "init bkp ->'''dvx'''"
+    kys dvx exp
 }
-
-_dev_dve_a() { echo "";} # todo
 
 # schedules
 
 _reg_aaa() {
-    _dev_lcl_vcs_xaa
+    _lcl_vcs_x
 }
-
 _reg_aab()
 {
     prnt "backup '''essentials'''"
-    _lcl_vcs_aaa
-    _rem_par_min
+    _lca_vcs_a
+    _rma_rst_min
     _notif
 }
 
@@ -92,23 +95,23 @@ main()
 {
     cmd="${1}" && shift 1
     ini
-
     case ${cmd} in
         tga)      _reg_aaa ;;
         tgb)      _reg_aab ;;
-        laa)      _dev_lcl_vcs_aaa ;;
-        raa)      _dev_rem_par_min ;;
-        # selectors
-        rma)      _dev_rem_raa ;;
-        lca)      _dev_lcl_laa ;;
-        dva)      _dev_dva_a ;;
-        dvb)      _dev_dvb_a ;;
-        dvc)      _dev_dvc_a ;;
+        laa)      _lcl_vcs_aaa ;;
+        raa)      _rem_par_min ;;
+        # local/remote selectors
+        rma)      _rem_raa ;;
+        lca)      _lcl_laa ;;
+        # dependent on device plugs
+        dva)      _dva_a ;;
+        dvb)      _dvb_a ;;
+        dvc)      _dvc_a ;;
+        dvx)      _dvx_a ;;
         # maintenance
         pre)      _bk_sys_ini ;;
         notif)    notif ;;
         *)        $(@) ;;
     esac
 }
-
 main "${@}"
