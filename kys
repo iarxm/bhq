@@ -1,60 +1,55 @@
 #!/usr/bin/env bash
 # iarom mail@iarom.org
+# TASK write test func to search for existence of provided env func for device
+# TASK insert readline and yes confirmation prompts at key places such as mkdir
 
 ini_v()
 {
-    rep=${1}
-    cmd=${2}
-    shift 2   
-    
+    declare -g rep=${1}
+    declare -g cmd=${2}
+    shift 2
     [ -f ${BHQC} ] \
         || { echo "missing bhq config; exiting"; exit; }
-
     source ${BHQC}
     _env_bhq
 }
 
-prnt_h1() { printf "KY: %s\n" " " "##" "${1}"; }
+env_set()     { _env_${rep} && ph1 "${BHQ_DEV}: ${KY_REPO}"; }
 
-prnt_h2() { printf "KY: %s\n" "--" "${1}"; }
-
-prnt()    { printf "KY: %s\n" "${1}"; }
-
-prnt_ln() { printf "\n"; }
+pln() { printf "\n"; }
+ph1() { printf "KY: %s\n" "${1}"; }
+ph2() { pln; printf "KY: %s\n" "${1}"; }
+pbd() { printf "KY: %s\n" "${1}"; }
 
 mkgpg()
 {
-    prnt "no gpg dir, creating it..."
+    pbd "no gpg dir, creating it..."
     gpgconf --kill gpg-agent
     mkdir "${GNUPGHOME}"
-    ln -s "${GNUPGHOME}" $HOME/.gnupg
+    ln -s "${GNUPGHOME}" ${HOME}/.gnupg
     chmod 700 "${GNUPGHOME}"
 }
 
 ini()
 {
-    [ "${rep}" ] || { prnt "no repo provided"; exit; }
-
-    [ "${cmd}" ] || { prnt "no cmd provided"; exit; }
-
-    prnt_h1 "init kys script..."
-
+    ph1 "init kys imp/exp script"
+    ini_v "${@}"
+    [ "${rep}" ] || { pbd "no repo provided"; exit; }
+    [ "${cmd}" ] || { pbd "no cmd provided"; exit; }
     [ -d "${GNUPGHOME}" ] || mkgpg
+    set_rep
 }
-
-env_set()     { ${1} && prnt_h1 "${BHQ_DEV}: ${KY_REPO}"; }
 
 set_rep()
 {
     case ${rep} in
-    dva) env_set _env_dva ;;
-    dvb) env_set _env_dvb ;;
-    dvc) env_set _env_dvc ;;
+    dva|dvb|dvc|dvx) env_set ;;
     #dvd) KY_REPO="$mnt_x/dvd/.key" ;;
     #dua) env_set env_dua ;;
     #dub) env_set env_dub ;;
     #duc) env_set env_duc ;;
     #rma) KY_REPO="$HOME/.config/key" ;; # remoe a : todo: systemitise using shamir's algorithm
+    *)    echo "no specific environment; exiting"; exit
     esac
 }
 
@@ -62,12 +57,14 @@ set_rep()
 
 gpg_bk_init()
 {
+    ph2 "init destination"
     mkdir -p ${KY_REPO}
     chmod 700 "${KY_REPO}"
 }
 
 gpg_bk_pub()
 {
+    ph2 "exporting public keys"
     gpg \
         --export \
         --armor \
@@ -77,6 +74,7 @@ gpg_bk_pub()
 
 gpg_bk_prv()
 {
+    ph2 "exporting secret keys"
     gpg \
         --export-secret-keys \
         --armor \
@@ -86,16 +84,29 @@ gpg_bk_prv()
 
 gpg_bk_trust()
 { 
+    ph2 "exporting ownertrust"
     gpg --export-ownertrust > "${KY_REPO}/ownertrust.txt"
 }
 
-gpg_ls_bk()    { ls -al "${KY_REPO}/"; }
+gpg_bk_revocs()
+{
+    ph2 "exporting revocs"
+    mkdir -p "$KY_REPO/revocs"
+    cp -a "${GNUPGHOME}/openpgp-revocs.d/." "$KY_REPO/revocs/"
+}
+
+gpg_ls_bk()
+{
+    ph2 "listing files in ${KY_REPO}"
+    ls -al "${KY_REPO}/"
+}
 
 gpg_bk()
 {
     gpg_bk_init
     gpg_bk_pub
     gpg_bk_prv
+    gpg_bk_revocs
     gpg_bk_trust
     gpg_ls_bk
 }
@@ -104,37 +115,36 @@ gpg_bk()
 
 gpg_imp_pub()
 {
-    prnt_h2 "importing Public Keys"
+    ph2 "importing Public Keys"
     gpg --import --import-options restore "${KY_REPO}/pubkeys.asc"
 }
 
 gpg_imp_priv()
 {
-    prnt_h2 "importing Private Keys"
+    ph2 "importing Private Keys"
     gpg --import --import-options restore "${KY_REPO}/privatekeys.asc"
 }
 
 gpg_imp_test()
 {
-    prnt_h2 "checking that Secret keys were imported"
+    ph2 "checking that Secret keys were imported"
     gpg -K
-    
-    prnt_h2 "checking that public keys were imported"
+    ph2 "checking that public keys were imported"
     gpg -k
 }
 
 gpg_imp_trust()
 {
-    prnt_h2 "importing ownertrust"
+    ph2 "importing ownertrust"
     gpg --import-ownertrust --import-options restore ${KY_REPO}/ownertrust.txt
 }
     
 gpg_imp_finish()
 {
-    prnt_h1 "Test encryption/decryption as the new user with the imported keys with:"
-    prnt "gpg -er USERID"
-    prnt "gpg -d"
-    prnt "Don't su over to the new user; login directly via ssh or console; Otherwise decryption and signing will likely fail, if the user doesnt own the shell.."
+    ph1 "Test encryption/decryption as the new user with the imported keys with:"
+    pbd "gpg -er USERID"
+    pbd "gpg -d"
+    pbd "Don't su over to the new user; login directly via ssh or console; Otherwise decryption and signing will likely fail, if the user doesnt own the shell.."
 }
 
 gpg_imp()
@@ -149,16 +159,12 @@ gpg_imp()
 
 main()
 {
-    ini_v ${@}
-    ini
-    set_rep
-   
+    ini "${@}"
     case ${cmd} in
-    exp|bk|bkp)    gpg_bk ;;
-    imp)           gpg_imp ;;
+        exp|bk|bkp)    gpg_bk ;;
+        imp)           gpg_imp ;;
     esac
-
-    prnt_ln
+    pln
 }
 
 main "${@}"
