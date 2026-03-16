@@ -5,7 +5,7 @@
 #set -e -o pipefail
 set -o pipefail
 
-ini()
+ini_v()
 {
     #declare -g hostname="${HOST}"
     declare -g brg_opts_env_common=()
@@ -28,7 +28,7 @@ ini()
 args_add()
 {
     if [ -n "${1}" ]; then
-        args+=( "${1}" )
+        args+=( "${@}" )
     else
         return 0
     fi
@@ -45,7 +45,7 @@ args_brg_create()
         "--progress"
         "--exclude-from" "${BHQ_EXL_AAX}"
     )
-    args_add "${argx}"
+    args_add "${argx[@]}"
     args_add "${@}"
     args+=(
         "::$(date +%y-%m-%d_%H-%M)"
@@ -54,9 +54,7 @@ args_brg_create()
 }
 
 prl()     { printf "\n"; }
-
 prh()     { printf "BRG: %s \n" " " "${1}"; }
-
 prn()     { printf "BRG: %s \n" "${@}"; }
 
 prn_args()
@@ -73,7 +71,7 @@ tst_args()
 
 env_set()
 {
-    ${1}
+    _env_${rep}
     prl; prn "${BHQ_DEV}: ${BORG_REPO} {${BORG_PASSCOMMAND}}"
 }
 
@@ -81,9 +79,8 @@ env_set_rem()
 {
     # todo
     nm_mobile && exit 1 #todo: exit function printing message
-    env_set "${1}"
+    env_set
 }
-
 
 brg_cmd() { exec borg "${args[@]}"; }
 
@@ -91,14 +88,17 @@ set_rep()
 {
     # TASK just generalise this
     case "${rep}" in
-        dva)  env_set "_env_dva"  ;;
-        dvb)  env_set "_env_dvb"  ;;
-        dvx)  env_set "_env_dvx"  ;;
-        lca)  env_set "_env_lca"  ;;
-        wasa) env_set "_env_r_wia" ;;
-        wasb) env_set "_rem_r_wib" ;;
+        dva|dvb|dvx|lca)  env_set ;;
+        #wasa) env_set "_env_r_wia" ;;
+        #wasb) env_set "_rem_r_wib" ;;
         *)    prn "repo required" && exit
     esac
+}
+
+ini()
+{
+    ini_v
+    set_rep
 }
 
 set_cmd()
@@ -146,8 +146,8 @@ set_cmd()
     compact)
         prn "prune ${BORG_REPO}"; prl
         args_add "${brg_args_env_common}"
-        args_add "${@}"
         args_add "compact"
+        #args_add "${@}" ?
         ;;
 
     bf|backup-full|full)
@@ -157,13 +157,16 @@ set_cmd()
 
     bm|backup-mid|bk-mid|mid)
         prn "src: partial mid '${SRC}/'"; prl
-        argx+=( "--exclude-from" "${BHQ_EXL_ABX}" )
+        argx+=(
+            "--exclude-from"
+            "${BHQ_EXL_ABX}"
+        )
         args_brg_create "${@}"
         ;;
   
     bh|backup-home)
-        #"Partial Home Backup # TODO
-        prn "src: backup-home '${SRC}/'"
+        # TASk
+        prn "src: backup-home partial '${SRC}/'"
         #argx+=("")
         args_brg_create "${@}"
         prn "TODO"
@@ -211,9 +214,7 @@ main()
     rep="${1}"
     cmd="${2}"
     shift 2
-
     ini
-    set_rep
     set_cmd "${@}"
     prn_args
     brg_cmd
