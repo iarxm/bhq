@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-
-# Author/Modifier: Iarom Madden
-
-# - [ ] replace vars with equivalent globals as in brg
-
+# iarom mail@iarom.org
 # restic backups
+
+# TASK replace vars with equivalent globals as in brg
+
 #hostname="$HOST"
 #set -e -o pipefail
 rep="$1"

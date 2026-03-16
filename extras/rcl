@@ -1,11 +1,11 @@
 #!/bin/env bash
+# iarom mail@iarom.org
 
-# - [ ] make like the rst version?
-# - Maybe not because for some destinations only one operation will be relevant
-# - other operations would destroy the state
-# - [ ] for more clarity, the operations will be defined by the destination or in some cases the source?
-
-# todo: decompose repeating code: vars can be declared by a function call with declare -g
+# TASK apply the brg wrapper type logic
+# maybe not because for some destinations only one operation will be relevant
+# other operations would destroy the state
+# TASK for more clarity, the operations will be defined by the destination or in some cases the source?
+# TASK decompose repeating code: vars can be declared by a function call with declare -g
 # --exclude-from "$exl" \
 # rc --exclude-from "$exl" \
 

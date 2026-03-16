@@ -7,5 +7,5 @@ all:
 install:
 	install -d $(BINDIR)
 	install -m 755 bhq $(BINDIR)
-	install -m 755 brg kys rsn rst $(BINDIR)
-	install -m 755 rcl rsy tarx $(BINDIR)
+	install -m 755 brg kys rst $(BINDIR)
+	#install -m 755 rsn rcl rsy tarx $(BINDIR)
