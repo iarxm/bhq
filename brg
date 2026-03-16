@@ -155,8 +155,8 @@ set_cmd()
         args_brg_create "${@}"
         ;;
 
-    bm|backup-mid|bk-mid)
-        prn "src: partial.mid '${SRC}/'"; prl
+    bm|backup-mid|bk-mid|mid)
+        prn "src: partial mid '${SRC}/'"; prl
         argx+=( "--exclude-from" "${BHQ_EXL_ABX}" )
         args_brg_create "${@}"
         ;;
