@@ -1,14 +1,11 @@
 #!/bin/env bash
-
-# iarom madden mail@iarom.org
-
+# iarom mail@iarom.org
 # backup meta script with device specs
 
 ini()
 {
     [ -f ${BHQC} ] \
         || { echo "missing bhq config; exiting"; exit; }
-
     source ${BHQC}
     _env_bhq
     _notif_env

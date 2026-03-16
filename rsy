@@ -1,6 +1,5 @@
 #!/bin/env bash
-# Iarom Madden mail@iarom.org
-
+# iarom mail@iarom.org
 # rsync Automation
 
 #set -e -o pipefail

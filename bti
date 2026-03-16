@@ -1,7 +1,5 @@
 #!/bin/env bash
-
-# iarom madden mail@iarom.org
-
+# iarom mail@iarom.org
 # backup meta script with device specifications
 
 _bk_sys_pre()

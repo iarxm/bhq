@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-
-# Iarom Madden mail@iarom.org
-
+# iarom mail@iarom.org
 # borg wrapper
 
 #set -e -o pipefail
@@ -91,6 +89,7 @@ brg_cmd() { exec borg "${args[@]}"; }
 
 set_rep()
 {
+    # TASK just generalise this
     case "${rep}" in
         dva)  env_set "_env_dva"  ;;
         dvb)  env_set "_env_dvb"  ;;
@@ -216,7 +215,6 @@ main()
     ini
     set_rep
     set_cmd "${@}"
-
     prn_args
     brg_cmd
 }

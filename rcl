@@ -145,4 +145,3 @@ case ${cmd} in
             $opt
     ;;
 esac
-
