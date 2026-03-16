@@ -11,6 +11,7 @@
 # TASK probably better to the content here config like
 # it heavily refers to user level custom cmds
 # TASK update schedules
+# TASK integrate pre cmd
 
 ini()
 {
@@ -27,7 +28,7 @@ notif() { notify-send -u low "${lineh}" "${linex}"; }
 
 _bk_sys_ini()
 {
-    _bk_sys_pre
+    bti pre
 }
 
 # bksq
